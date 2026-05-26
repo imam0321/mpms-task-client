@@ -1,0 +1,42 @@
+"use server";
+
+import jwt from "jsonwebtoken";
+
+export const verifyAccessToken = async (token: string) => {
+  try {
+    const verifiedAccessToken = jwt.verify(
+      token,
+      process.env.JWT_ACCESS_SECRET!
+    ) as jwt.JwtPayload;
+
+    return {
+      success: true,
+      message: "Token is valid",
+      payload: verifiedAccessToken,
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error?.message || "Invalid token",
+    };
+  }
+};
+
+export const verifyResetPasswordToken = async (token: string) => {
+  try {
+    const verifiedResetToken = jwt.verify(
+      token,
+      process.env.JWT_ACCESS_SECRET as string
+    ) as jwt.JwtPayload;
+    return {
+      success: true,
+      message: "Token is valid",
+      payload: verifiedResetToken,
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error?.message || "Invalid token",
+    };
+  }
+};
