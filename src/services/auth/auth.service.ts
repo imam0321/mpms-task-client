@@ -5,6 +5,7 @@ import { verifyAccessToken } from "@/lib/jwt";
 import { getCookie, deleteCookie, setCookie } from "./tokenHandlers";
 import { serverFetch } from "@/lib/server-fetch";
 import { parse } from "set-cookie-parser";
+import type { Cookie } from "set-cookie-parser";
 
 
 export async function getNewAccessToken() {
@@ -34,8 +35,8 @@ export async function getNewAccessToken() {
       };
     }
 
-    let accessTokenObject: null | any = null;
-    let refreshTokenObject: null | any = null;
+    let accessTokenObject: Cookie | null = null;
+    let refreshTokenObject: Cookie | null = null;
 
     const response = await serverFetch.post("/auth/refresh-token", {
       headers: {
@@ -48,16 +49,19 @@ export async function getNewAccessToken() {
     const setCookieHeaders = response.headers.getSetCookie();
 
     if (setCookieHeaders && setCookieHeaders.length > 0) {
-      setCookieHeaders.forEach((cookie: string) => {
-        const parsedCookie = parse(cookie);
+      for (const cookie of setCookieHeaders) {
+        const parsedCookies = parse(cookie);
+        const parsedCookie = parsedCookies[0];
 
-        if (parsedCookie["accessToken"]) {
-          accessTokenObject = parsedCookie;
+        if (parsedCookie) {
+          if (parsedCookie.name === "accessToken") {
+            accessTokenObject = parsedCookie;
+          }
+          if (parsedCookie.name === "refreshToken") {
+            refreshTokenObject = parsedCookie;
+          }
         }
-        if (parsedCookie["refreshToken"]) {
-          refreshTokenObject = parsedCookie;
-        }
-      });
+      }
     } else {
       throw new Error("No Set-Cookie header found");
     }
@@ -71,21 +75,21 @@ export async function getNewAccessToken() {
     }
 
     await deleteCookie("accessToken");
-    await setCookie("accessToken", accessTokenObject.accessToken, {
+    await setCookie("accessToken", accessTokenObject.value, {
       httpOnly: true,
       secure: true,
       sameSite: "none",
-      maxAge: parseInt(accessTokenObject["Max-Age"]) || 60 * 60 * 24,
-      path: accessTokenObject.Path || "/",
+      maxAge: accessTokenObject.maxAge || 60 * 60 * 24,
+      path: accessTokenObject.path || "/",
     });
 
     await deleteCookie("refreshToken");
-    await setCookie("refreshToken", refreshTokenObject.refreshToken, {
+    await setCookie("refreshToken", refreshTokenObject.value, {
       httpOnly: true,
       secure: true,
       sameSite: "none",
-      maxAge: parseInt(refreshTokenObject["Max-Age"]) || 60 * 60 * 24 * 30,
-      path: refreshTokenObject.Path || "/",
+      maxAge: refreshTokenObject.maxAge || 60 * 60 * 24 * 30,
+      path: refreshTokenObject.path || "/",
     });
 
     if (!result.success) {

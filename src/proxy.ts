@@ -8,12 +8,14 @@ import { UserRole, getRouteOwner, isAuthRoute, getDefaultDashboardRoute } from "
 
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
+
   const hasTokenRefreshedParam =
     request.nextUrl.searchParams.has("tokenRefreshed");
 
   if (hasTokenRefreshedParam) {
     const url = request.nextUrl.clone();
     url.searchParams.delete("tokenRefreshed");
+
     return NextResponse.redirect(url);
   }
 
@@ -22,6 +24,7 @@ export async function proxy(request: NextRequest) {
   if (tokenRefreshResult?.tokenRefreshed) {
     const url = request.nextUrl.clone();
     url.searchParams.set("tokenRefreshed", "true");
+
     return NextResponse.redirect(url);
   }
 
@@ -44,12 +47,27 @@ export async function proxy(request: NextRequest) {
   }
 
   const routerOwner = getRouteOwner(pathname);
-
   const isAuth = isAuthRoute(pathname);
 
   if (accessToken && isAuth) {
     return NextResponse.redirect(
       new URL(getDefaultDashboardRoute(userRole as UserRole), request.url)
+    );
+  }
+
+  if (pathname === "/") {
+    return NextResponse.redirect(
+      new URL(
+        accessToken && userRole
+          ? getDefaultDashboardRoute(userRole)
+          : "/login", request.url
+      )
+    );
+  }
+
+  if (accessToken && userRole && isAuthRoute(pathname)) {
+    return NextResponse.redirect(
+      new URL(getDefaultDashboardRoute(userRole), request.url)
     );
   }
 
@@ -59,22 +77,20 @@ export async function proxy(request: NextRequest) {
 
   if (!accessToken) {
     const loginUrl = new URL("/login", request.url);
+
     loginUrl.searchParams.set("redirect", pathname);
+
     return NextResponse.redirect(loginUrl);
   }
 
   if (
-    routerOwner === "Admin" ||
-    routerOwner === "Manager" ||
-    routerOwner === "Member"
+    ["Admin", "Manager", "Member"].includes(routerOwner as string) &&
+    userRole !== routerOwner
   ) {
-    if (userRole !== routerOwner) {
-      return NextResponse.redirect(
-        new URL(getDefaultDashboardRoute(userRole as UserRole), request.url)
-      );
-    }
+    return NextResponse.redirect(
+      new URL(getDefaultDashboardRoute(userRole!), request.url)
+    );
   }
-
 
   return NextResponse.next();
 }
