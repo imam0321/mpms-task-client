@@ -14,6 +14,7 @@ export async function loginUser(_currentState: any, formData: FormData) {
     let accessTokenObject: null | any = null;
     let refreshTokenObject: null | any = null;
     const redirectPath = formData.get("redirectPath") || null;
+    const fromRegistration = formData.get("fromRegistration") === "true";
 
     const payload = {
       email: formData.get("email"),
@@ -132,7 +133,8 @@ export async function loginUser(_currentState: any, formData: FormData) {
     }
 
     const separator = targetRedirect.includes("?") ? "&" : "?";
-    redirect(`${targetRedirect}${separator}loggedIn=true`);
+    const successParam = fromRegistration ? "registered=true" : "loggedIn=true";
+    redirect(`${targetRedirect}${separator}${successParam}`);
 
   } catch (error: any) {
     if (error?.digest?.startsWith("NEXT_REDIRECT")) {

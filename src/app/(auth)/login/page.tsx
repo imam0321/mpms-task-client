@@ -35,12 +35,12 @@ export default async function LoginPage({
 						<LoginForm redirectPath={params?.redirect} />
 					</CardContent>
 
-					<CardFooter className="flex justify-center py-4"> 
+					<CardFooter className="flex justify-center py-4">
 						<Link href="/register" className="w-full">
 							<p className="text-center text-zinc-400 hover:text-white transition-colors">
 								Don&apos;t have an account?{" "}
 								<span className="text-violet-400 font-medium hover:underline">
-									Create one
+									Register now
 								</span>
 							</p>
 						</Link>

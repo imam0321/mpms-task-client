@@ -10,6 +10,7 @@ import { Eye, EyeOff, Lock, LogIn, Mail } from "lucide-react";
 import { useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import PasswordInput from "@/components/ui/PasswordInput";
 
 const demoUsers = {
   admin: {
@@ -31,7 +32,6 @@ export default function LoginForm({
 }: {
   redirectPath?: string;
 }) {
-  const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -61,7 +61,7 @@ export default function LoginForm({
   };
 
   return (
-    <form action={formAction} className="space-y-2">
+    <form action={formAction} className="space-y-3.5">
       <div className="space-y-1">
         <div className="grid grid-cols-3 gap-2.5">
           {(["admin", "manager", "member"] as const).map((role) => (
@@ -90,15 +90,15 @@ export default function LoginForm({
 
       <input type="hidden" name="redirectPath" value={redirectPath || ""} />
 
-      <Field>
+      <Field className="gap-1.5">
         <FieldLabel
-          className="text-zinc-300 text-sm font-medium pl-2"
+          className="text-zinc-300 text-xs font-semibold pl-2"
         >
           Email Address
         </FieldLabel>
 
         <div className="relative group">
-          <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 group-focus-within:text-violet-400 transition-colors" />
+          <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 group-focus-within:text-violet-400 transition-colors" />
 
           <Input
             name="email"
@@ -106,7 +106,7 @@ export default function LoginForm({
             placeholder="you@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="pl-11 h-12 bg-zinc-950/60 border-white/5 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/10 text-white placeholder:text-zinc-600 transition-all rounded-xl"
+            className="pl-10 h-11 bg-zinc-950/60 border-white/5 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/10 text-white placeholder:text-zinc-600 transition-all rounded-xl text-sm"
             disabled={isPending}
           />
         </div>
@@ -114,48 +114,20 @@ export default function LoginForm({
         <InputFieldError field="email" state={state} />
       </Field>
 
-      <Field>
-        <FieldLabel
-          className="text-zinc-300 text-sm font-medium pl-2"
-        >
-          Password
-        </FieldLabel>
-
-        <div className="relative group">
-          <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 group-focus-within:text-violet-400 transition-colors" />
-
-          <Input
-            name="password"
-            type={showPassword ? "text" : "password"}
-            placeholder="••••••••"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="pl-11 pr-12 h-12 bg-zinc-950/60 border-white/5 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/10 text-white placeholder:text-zinc-600 transition-all rounded-xl"
-            disabled={isPending}
-          />
-
-          <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors p-1 rounded-md focus:outline-none focus:ring-1 focus:ring-violet-500/30"
-            aria-label={showPassword ? "Hide password" : "Show password"}
-            tabIndex={-1}
-          >
-            {showPassword ? (
-              <EyeOff className="h-4 w-4" />
-            ) : (
-              <Eye className="h-4 w-4" />
-            )}
-          </button>
-        </div>
-
-        <InputFieldError field="password" state={state} />
-      </Field>
+      <PasswordInput
+        name="password"
+        label="Password"
+        placeholder="••••••••"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        disabled={isPending}
+        state={state}
+      />
 
       <Button
         type="submit"
         disabled={isPending}
-        className="w-full h-12 text-sm font-semibold bg-violet-600 hover:bg-violet-700 text-white shadow-lg shadow-violet-600/10 hover:shadow-violet-600/20 active:scale-[0.99] transition-all rounded-xl mt-2"
+        className="w-full h-11 text-sm font-semibold bg-violet-600 hover:bg-violet-700 text-white shadow-lg shadow-violet-600/10 hover:shadow-violet-600/20 active:scale-[0.99] transition-all rounded-xl mt-2"
       >
         {isPending ? (
           <div className="flex items-center justify-center gap-2">

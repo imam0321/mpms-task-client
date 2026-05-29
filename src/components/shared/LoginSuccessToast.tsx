@@ -9,11 +9,21 @@ export default function LoginSuccessToast() {
   const shown = useRef(false);
 
   useEffect(() => {
-    if (searchParams.get("loggedIn") === "true" && !shown.current) {
+    const isLoggedIn = searchParams.get("loggedIn") === "true";
+    const isRegistered = searchParams.get("registered") === "true";
+
+    if ((isLoggedIn || isRegistered) && !shown.current) {
       shown.current = true;
-      toast.success("You have been logged in successfully.");
+
+      if (isRegistered) {
+        toast.success("Registration successful! Welcome aboard 🎉");
+      } else {
+        toast.success("You have been logged in successfully.");
+      }
+
       const url = new URL(window.location.href);
       url.searchParams.delete("loggedIn");
+      url.searchParams.delete("registered");
       router.replace(url.pathname + (url.searchParams.toString() ? "?" + url.searchParams.toString() : ""));
     }
   }, [searchParams, router]);
