@@ -18,8 +18,8 @@ const demoUsers = {
     password: "123456789",
   },
   member: {
-    email: "imam.hossain0321@gmail.com",
-    password: "123456789",
+    email: "puloweseku@mailinator.com",
+    password: "puloweseku@mailinator.com",
   },
   manager: {
     email: "moderator@gmail.com",

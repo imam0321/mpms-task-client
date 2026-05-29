@@ -1,8 +1,13 @@
 import { FolderGit2 } from "lucide-react";
 
-export default function LogoWithTitle() {
+interface LogoWithTitleProps {
+  isAbsolute?: boolean;
+  className?: string;
+}
+
+export default function LogoWithTitle({ isAbsolute = true, className = "" }: LogoWithTitleProps) {
   return (
-    <div className="absolute top-8 left-8 flex items-center gap-3 select-none z-50">
+    <div className={`${isAbsolute ? "absolute top-8 left-8" : "relative"} flex items-center gap-3 select-none z-50 ${className}`}>
       <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-tr from-blue-600 to-cyan-500 shadow-lg shadow-blue-500/30 transition-all hover:scale-105 active:scale-95">
         <FolderGit2 className="h-6 w-6 text-white" />
       </div>
