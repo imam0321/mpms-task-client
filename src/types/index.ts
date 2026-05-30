@@ -13,3 +13,4 @@ export interface TActionResponse<T = unknown, F = unknown> {
   errors?: { field: string; message: string }[];
   formData?: F;
 }
+

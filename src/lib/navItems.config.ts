@@ -30,34 +30,6 @@ export const adminNavItems: NavSection[] = [
         roles: ["Admin"],
       },
       {
-        title: "Projects",
-        href: "/dashboard/admin/projects",
-        icon: "FolderKanban",
-        roles: ["Admin"],
-      },
-    ],
-  },
-  {
-    title: "Agile Tracking",
-    items: [
-      {
-        title: "Sprints",
-        href: "/dashboard/admin/sprints",
-        icon: "Activity",
-        roles: ["Admin"],
-      },
-      {
-        title: "Task Board",
-        href: "/dashboard/admin/tasks",
-        icon: "ListTodo",
-        roles: ["Admin"],
-      },
-    ],
-  },
-  {
-    title: "Operations",
-    items: [
-      {
         title: "Time Tracker",
         href: "/dashboard/admin/timelogs",
         icon: "Clock",
@@ -83,23 +55,11 @@ export const managerNavItems: NavSection[] = [
         icon: "FolderKanban",
         roles: ["Manager"],
       },
-      {
-        title: "Sprints",
-        href: "/dashboard/manager/sprints",
-        icon: "Activity",
-        roles: ["Manager"],
-      },
     ],
   },
   {
-    title: "Agile Boards",
+    title: "Operations",
     items: [
-      {
-        title: "Task Tracking",
-        href: "/dashboard/manager/tasks",
-        icon: "ListTodo",
-        roles: ["Manager"],
-      },
       {
         title: "Time Logs",
         href: "/dashboard/manager/timelogs",
@@ -115,9 +75,9 @@ export const memberNavItems: NavSection[] = [
     title: "My Workspace",
     items: [
       {
-        title: "My Tasks",
-        href: "/dashboard/member/tasks",
-        icon: "ListTodo",
+        title: "My Projects",
+        href: "/dashboard/member/projects",
+        icon: "FolderKanban",
         roles: ["Member"],
       },
       {

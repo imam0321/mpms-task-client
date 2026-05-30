@@ -145,10 +145,19 @@
   }
 
   body {
-    @apply bg-background;
+    @apply bg-background text-foreground;
+    color-scheme: dark;
   }
 
   html {
     @apply font-sans;
+  }
+
+  /* Force native select/option elements to respect dark theme */
+  select,
+  select option {
+    color-scheme: dark;
+    background-color: oklch(0.14 0.03 240);
+    color: oklch(0.90 0.02 230);
   }
 }

@@ -14,17 +14,17 @@ export const commonProtectedRoutes: RouteConfig = {
 
 export const adminOnlyRoutes: RouteConfig = {
   exact: ["/dashboard/admin"],
-  patterns: [],
+  patterns: [/^\/dashboard\/admin(\/.*)?$/],
 }
 
 export const managerOnlyRoutes: RouteConfig = {
   exact: ["/dashboard/manager"],
-  patterns: [],
+  patterns: [/^\/dashboard\/manager(\/.*)?$/],
 }
 
 export const memberOnlyRoutes: RouteConfig = {
   exact: ["/dashboard/member"],
-  patterns: [],
+  patterns: [/^\/dashboard\/member(\/.*)?$/],
 }
 
 export const isAuthRoute = (pathname: string) => {
