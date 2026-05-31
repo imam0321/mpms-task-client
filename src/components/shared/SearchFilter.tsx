@@ -18,7 +18,7 @@ export default function SearchFilter({
   const searchParams = useSearchParams();
   const [value, setValue] = useState(searchParams.get(paramName) || "");
   const debouncedValue = useDebounce(value, 500);
-  const [, startTransition] = useTransition();
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());
@@ -28,14 +28,12 @@ export default function SearchFilter({
 
     if (debouncedValue) {
       params.set(paramName, debouncedValue);
-      params.set("page", "1");
     } else {
       params.delete(paramName);
-      params.delete("page");
     }
 
     startTransition(() => {
-      router.push(`?${params.toString()}`);
+      router.push(`?${params.toString()}`, { scroll: false });
     });
   }, [debouncedValue, paramName, searchParams, router]);
 

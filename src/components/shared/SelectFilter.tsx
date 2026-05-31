@@ -40,7 +40,7 @@ export default function SelectFilter({
     }
 
     startTransition(() => {
-      router.push(`?${params.toString()}`);
+      router.push(`?${params.toString()}`, { scroll: false });
     });
 
     setMobileOpen(false);
@@ -93,8 +93,8 @@ export default function SelectFilter({
               key={option.value}
               onClick={() => handleChange(option.value)}
               className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all ${currentValue === option.value
-                  ? "bg-indigo-600/20 text-indigo-400"
-                  : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900"
+                ? "bg-indigo-600/20 text-indigo-400"
+                : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900"
                 }`}
             >
               {option.label}

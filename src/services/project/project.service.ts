@@ -4,12 +4,16 @@ import { serverFetch } from "@/lib/server-fetch";
 
 export async function getAllProjects(queryString?: string) {
   try {
-    const endpoint = queryString ? `/projects?${queryString}` : "/projects";
-    const res = await serverFetch.get(endpoint);
+    const res = await serverFetch.get(
+      `/projects${queryString ? `?${queryString}` : ""}`
+    );
     const result = await res.json();
     return result;
   } catch (error: any) {
-    return { success: false, message: error?.message || "Failed to fetch projects" };
+    return {
+      success: false,
+      message: error.message,
+    };
   }
 }
 
