@@ -1,20 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import ProjectCard from "./ProjectCard";
-import { IProject, IUser, ProjectStatus } from "@/types/api.types";
+import { IProject, IUser } from "@/types/api.types";
 import { deleteProject } from "@/services/project/project.service";
 import ConfirmDialog from "@/components/shared/ConfirmDialog";
 import SearchFilter from "@/components/shared/SearchFilter";
 import SelectFilter from "@/components/shared/SelectFilter";
 import NoProjectsFound from "./NoProjectsFound";
 import ProjectFormDialog from "./ProjectFormDialog";
-import ProjectCardSkeleton from "./ProjectCardSkeleton";
+import ProjectCardSkeleton from "./ProjectSkeleton/ProjectCardSkeleton";
 
 interface ProjectManagementProps {
   projects: IProject[];
@@ -120,11 +120,11 @@ export default function ProjectManagement({
             <ProjectCardSkeleton key={i} />
           ))}
         </div>
-      ) : projects.length === 0 ? (
+      ) : projects?.length === 0 ? (
         <NoProjectsFound />
       ) : (
         <div className="space-y-8 animate-in fade-in duration-300">
-          {projects.length > 0 && (
+          {projects?.length > 0 && (
             <div className="space-y-4 z-10">
               <div className="flex justify-between items-center">
                 <h4 className="text-sm font-semibold uppercase tracking-wider text-zinc-400">Featured Projects</h4>
@@ -144,29 +144,31 @@ export default function ProjectManagement({
           )}
         </div>
       )}
-
-      <ProjectFormDialog
-        open={openModal}
-        onClose={() => setOpenModal(false)}
-        onSuccess={handleSuccess}
-        project={editingProject}
-        allUsers={users}
-      />
-
-      <ConfirmDialog
-        open={!!projectToDelete}
-        setOpen={(val) => !val && setProjectToDelete(null)}
-        onConfirm={handleDelete}
-        title="Delete Project"
-        description={
-          <>
-            Are you sure you want to delete project <span className="font-semibold text-zinc-200">&quot;{projectToDelete?.title}&quot;</span>? This action is irreversible.
-          </>
-        }
-        confirmText="Delete Project"
-        confirmVariant="destructive"
-        disabled={isPending}
-      />
+      {canManage && (
+        <ProjectFormDialog
+          open={openModal}
+          onClose={() => setOpenModal(false)}
+          onSuccess={handleSuccess}
+          project={editingProject}
+          allUsers={users}
+        />
+      )}
+      {canManage && (
+        <ConfirmDialog
+          open={!!projectToDelete}
+          setOpen={(val) => !val && setProjectToDelete(null)}
+          onConfirm={handleDelete}
+          title="Delete Project"
+          description={
+            <>
+              Are you sure you want to delete project <span className="font-semibold text-zinc-200">&quot;{projectToDelete?.title}&quot;</span>? This action is irreversible.
+            </>
+          }
+          confirmText="Delete Project"
+          confirmVariant="destructive"
+          disabled={isPending}
+        />
+      )}
     </div>
   );
 }
