@@ -141,7 +141,7 @@ export default function ProjectCard({ project, onEdit, onDelete, basePath }: Pro
           </div>
         </div>
 
-        <div className="flex flex-col gap-1.5">
+        {/* <div className="flex flex-col gap-1.5">
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">
               Time elapsed
@@ -156,7 +156,7 @@ export default function ProjectCard({ project, onEdit, onDelete, basePath }: Pro
               style={{ width: `${percentage}%` }}
             />
           </div>
-        </div>
+        </div> */}
 
         <div className="flex items-center justify-between">
           <span className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">
