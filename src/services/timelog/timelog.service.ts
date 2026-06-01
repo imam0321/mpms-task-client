@@ -3,6 +3,15 @@
 
 import { serverFetch } from "@/lib/server-fetch";
 
+export async function getMyTimeLogStats() {
+  try {
+    const res = await serverFetch.get("/timelogs/me/stats");
+    return res.json();
+  } catch (error: any) {
+    return { success: false, message: error?.message || "Failed to fetch time log stats" };
+  }
+}
+
 export async function getTimeLogsByTask(taskId: string) {
   try {
     const res = await serverFetch.get(`/timelogs/task/${taskId}`);

@@ -22,9 +22,11 @@ export async function getUserWorkloadReport(userId: string) {
   }
 }
 
-export async function getOverviewReport() {
+export async function getOverviewReport(queryString?: string) {
   try {
-    const res = await serverFetch.get("/reports/overview");
+    const res = await serverFetch.get(
+      `/reports/overview${queryString ? `?${queryString}` : ""}`
+    );
     const result = await res.json();
     return result;
   } catch (error: any) {
