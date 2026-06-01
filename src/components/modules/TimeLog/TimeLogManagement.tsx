@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useTransition } from "react";
+import React, { useState, useEffect, useTransition, useActionState } from "react";
+import InputFieldError from "@/components/shared/InputFieldError";
 import {
   Clock, Plus, Trash2, Calendar, Loader2, Folder, ClipboardList,
   ChevronDown, ChevronUp, User, FileText, BarChart3, X
@@ -37,6 +38,33 @@ export default function TimeLogManagement({ projects, currentUser }: TimeLogMana
   const [hours, setHours] = useState<number | "">("");
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [description, setDescription] = useState("");
+
+  const [state, formAction, isPendingAction] = useActionState(
+    createTimeLog,
+    null
+  );
+
+  useEffect(() => {
+    if (state) {
+      if (state.success) {
+        toast.success("Time log entry recorded!");
+        setActiveLogTaskId(null);
+        const taskId = state.formData?.task || state.data?.task;
+        if (taskId) {
+          fetchTaskLogs(taskId);
+        }
+      } else {
+        if (state.message && state.message !== "Validation failed") {
+          toast.error(state.message);
+        }
+        if (state.formData) {
+          setHours(state.formData.hours ? Number(state.formData.hours) : "");
+          setDate(state.formData.date || "");
+          setDescription(state.formData.description || "");
+        }
+      }
+    }
+  }, [state]);
 
   const handleProjectChange = async (projectId: string) => {
     setSelectedProjectId(projectId);
@@ -97,34 +125,7 @@ export default function TimeLogManagement({ projects, currentUser }: TimeLogMana
     setActiveLogTaskId(taskId);
   };
 
-  const handleLogSubmit = (e: React.FormEvent, taskId: string) => {
-    e.preventDefault();
-    if (!hours) {
-      toast.error("Hours are required.");
-      return;
-    }
-
-    startTransition(async () => {
-      try {
-        const res = await createTimeLog({
-          task: taskId,
-          hours: Number(hours),
-          date,
-          description: description.trim() || undefined,
-        });
-
-        if (res?.success) {
-          toast.success("Time log entry recorded!");
-          setActiveLogTaskId(null);
-          fetchTaskLogs(taskId);
-        } else {
-          toast.error(res?.message || "Failed to log time");
-        }
-      } catch (err: any) {
-        toast.error(err?.message || "An error occurred");
-      }
-    });
-  };
+  // handleLogSubmit removed in favor of Server Action formAction
 
   const handleDeleteLog = (logId: string, taskId: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -311,13 +312,14 @@ export default function TimeLogManagement({ projects, currentUser }: TimeLogMana
                       onClick={(e) => e.stopPropagation()}
                       className="px-5 pb-5 pt-1 border-t border-zinc-900 bg-zinc-950/40"
                     >
-                      <form onSubmit={(e) => handleLogSubmit(e, task._id)} className="space-y-4 max-w-lg mt-3">
+                      <form action={formAction} className="space-y-4 max-w-lg mt-3">
+                        <input type="hidden" name="task" value={task._id} />
                         <div className="flex items-center justify-between pb-1">
                           <h6 className="text-[11px] font-bold text-indigo-400 uppercase tracking-wider">Log Work Hours</h6>
                           <button
                             type="button"
                             onClick={() => setActiveLogTaskId(null)}
-                            className="text-zinc-500 hover:text-zinc-300 transition cursor-pointer"
+                            className="text-zinc-550 hover:text-zinc-350 transition cursor-pointer"
                           >
                             <X className="h-4 w-4" />
                           </button>
@@ -328,6 +330,7 @@ export default function TimeLogManagement({ projects, currentUser }: TimeLogMana
                             <FieldContent>
                               <Input
                                 type="number"
+                                name="hours"
                                 placeholder="E.g. 2.5"
                                 value={hours}
                                 onChange={(e) => setHours(e.target.value === "" ? "" : Number(e.target.value))}
@@ -336,6 +339,7 @@ export default function TimeLogManagement({ projects, currentUser }: TimeLogMana
                                 className="bg-zinc-900/40 border-zinc-800 text-zinc-200 focus:border-zinc-700 rounded-xl h-8.5 text-xs"
                                 required
                               />
+                              <InputFieldError field="hours" state={state} />
                             </FieldContent>
                           </Field>
                           <Field>
@@ -343,11 +347,13 @@ export default function TimeLogManagement({ projects, currentUser }: TimeLogMana
                             <FieldContent>
                               <Input
                                 type="date"
+                                name="date"
                                 value={date}
                                 onChange={(e) => setDate(e.target.value)}
                                 className="bg-zinc-900/40 border-zinc-800 text-zinc-200 focus:border-zinc-700 rounded-xl h-8.5 text-xs cursor-pointer"
                                 required
                               />
+                              <InputFieldError field="date" state={state} />
                             </FieldContent>
                           </Field>
                         </div>
@@ -356,20 +362,22 @@ export default function TimeLogManagement({ projects, currentUser }: TimeLogMana
                           <FieldContent>
                             <Input
                               type="text"
+                              name="description"
                               placeholder="Brief summary of tasks done..."
                               value={description}
                               onChange={(e) => setDescription(e.target.value)}
                               className="bg-zinc-900/40 border-zinc-800 text-zinc-200 focus:border-zinc-700 rounded-xl h-8.5 text-xs"
                             />
+                            <InputFieldError field="description" state={state} />
                           </FieldContent>
                         </Field>
                         <div className="flex gap-2">
                           <Button
                             type="submit"
-                            disabled={isPending}
+                            disabled={isPendingAction}
                             className="bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] h-8.5 rounded-xl font-bold px-4 cursor-pointer"
                           >
-                            {isPending ? "Submitting..." : "Save Time Entry"}
+                            {isPendingAction ? "Submitting..." : "Save Time Entry"}
                           </Button>
                           <Button
                             type="button"

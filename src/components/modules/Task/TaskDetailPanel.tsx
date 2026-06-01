@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useState, useEffect, useTransition } from "react";
+import React, { useState, useEffect, useTransition, useActionState, useRef } from "react";
+import InputFieldError from "@/components/shared/InputFieldError";
 import {
   Clock,
   Calendar,
@@ -75,6 +76,36 @@ export default function TaskDetailPanel({
   );
   const [logNote, setLogNote] = useState("");
   const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
+
+  const [logTimeState, logTimeAction, isLoggingTimePending] = useActionState(
+    logTime,
+    null
+  );
+
+  const prevLogTimeStateRef = useRef(logTimeState);
+
+  useEffect(() => {
+    if (logTimeState === prevLogTimeStateRef.current) return;
+    prevLogTimeStateRef.current = logTimeState;
+
+    if (logTimeState) {
+      if (logTimeState.success) {
+        setLogHours("");
+        setLogNote("");
+        toast.success("Time logged successfully!");
+        fetchTaskDetails();
+      } else {
+        if (logTimeState.message && logTimeState.message !== "Validation failed") {
+          toast.error(logTimeState.message);
+        }
+        if (logTimeState.formData) {
+          setLogHours(logTimeState.formData.hours ? Number(logTimeState.formData.hours) : "");
+          setLogDate(logTimeState.formData.date || "");
+          setLogNote(logTimeState.formData.note || "");
+        }
+      }
+    }
+  }, [logTimeState]);
 
   const fetchTaskDetails = async () => {
     if (!taskId) return;
@@ -199,30 +230,7 @@ export default function TaskDetailPanel({
     });
   };
 
-  const handleLogTime = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!logHours || !task) return;
-
-    startTransition(async () => {
-      try {
-        const res = await logTime(task._id, {
-          hours: Number(logHours),
-          date: logDate,
-          note: logNote.trim() || undefined,
-        });
-        if (res?.success) {
-          setLogHours("");
-          setLogNote("");
-          toast.success("Time logged successfully!");
-          fetchTaskDetails();
-        } else {
-          toast.error(res?.message || "Failed to log time");
-        }
-      } catch (err: any) {
-        toast.error(err?.message || "An error occurred");
-      }
-    });
-  };
+  // handleLogTime removed in favor of Server Action logTimeAction
 
   const handleAddAttachment = (e: React.FormEvent) => {
     e.preventDefault();
@@ -263,7 +271,7 @@ export default function TaskDetailPanel({
     Medium: "bg-indigo-500/10 text-indigo-400 border-indigo-500/20",
     Low: "bg-zinc-500/10 text-zinc-400 border-zinc-500/20",
   };
-  console.log(task)
+
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
@@ -274,15 +282,94 @@ export default function TaskDetailPanel({
       >
         <SheetTitle className="sr-only">Task Details: {task?.title || 'Loading'}</SheetTitle>
         {isLoading && !task ? (
-          <div className="flex flex-col items-center justify-center h-full">
-            <Loader2 className="h-8 w-8 text-indigo-500 animate-spin mb-3" />
-            <span className="text-zinc-500 text-sm font-semibold">
-              Loading task...
-            </span>
+          <div className="flex flex-col h-full animate-pulse">
+            {/* Skeleton Header */}
+            <div className="p-6 border-b border-zinc-900/80 shrink-0">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="h-4 w-14 bg-zinc-800 rounded-full" />
+                <div className="h-3 w-20 bg-zinc-800/60 rounded" />
+              </div>
+              <div className="h-6 w-3/4 bg-zinc-800 rounded-lg mb-2" />
+              <div className="h-3 w-1/3 bg-zinc-800/50 rounded" />
+            </div>
+
+            {/* Skeleton Status Bar */}
+            <div className="px-6 py-3 border-b border-zinc-900/80 bg-zinc-950/50 flex items-center justify-between shrink-0">
+              <div className="flex flex-col gap-1">
+                <div className="h-2 w-16 bg-zinc-800/60 rounded" />
+                <div className="h-4 w-24 bg-zinc-800 rounded" />
+              </div>
+              <div className="h-8 w-28 bg-zinc-800 rounded-lg" />
+            </div>
+
+            {/* Skeleton Tabs */}
+            <div className="flex border-b border-zinc-900 shrink-0 bg-zinc-950 gap-1 px-1">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="flex-1 py-3 flex items-center justify-center">
+                  <div className="h-4 w-12 bg-zinc-800/50 rounded" />
+                </div>
+              ))}
+            </div>
+
+            {/* Skeleton Content */}
+            <div className="flex-1 p-6 space-y-6">
+              {/* Meta Grid */}
+              <div className="grid grid-cols-2 gap-4 p-4 rounded-xl border border-zinc-900 bg-zinc-950/40">
+                <div className="space-y-2">
+                  <div className="h-2 w-12 bg-zinc-800/60 rounded" />
+                  <div className="h-4 w-24 bg-zinc-800 rounded" />
+                </div>
+                <div className="space-y-2">
+                  <div className="h-2 w-16 bg-zinc-800/60 rounded" />
+                  <div className="h-4 w-20 bg-zinc-800 rounded" />
+                </div>
+              </div>
+
+              {/* Description Skeleton */}
+              <div className="space-y-2">
+                <div className="h-2 w-20 bg-zinc-800/60 rounded" />
+                <div className="p-4 rounded-xl border border-zinc-900/60 space-y-2">
+                  <div className="h-3 w-full bg-zinc-800/40 rounded" />
+                  <div className="h-3 w-5/6 bg-zinc-800/40 rounded" />
+                  <div className="h-3 w-2/3 bg-zinc-800/40 rounded" />
+                </div>
+              </div>
+
+              {/* Assignees Skeleton */}
+              <div className="space-y-2">
+                <div className="h-2 w-24 bg-zinc-800/60 rounded" />
+                <div className="flex flex-wrap gap-2">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="flex items-center gap-2 p-1.5 pr-3 bg-zinc-900/50 border border-zinc-800 rounded-xl">
+                      <div className="h-6 w-6 rounded-full bg-zinc-800" />
+                      <div className="space-y-1">
+                        <div className="h-3 w-16 bg-zinc-800 rounded" />
+                        <div className="h-2 w-10 bg-zinc-800/50 rounded" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Subtasks Skeleton */}
+              <div className="space-y-2">
+                <div className="h-2 w-28 bg-zinc-800/60 rounded" />
+                <div className="space-y-2">
+                  {[1, 2].map((i) => (
+                    <div key={i} className="flex items-center gap-3 p-3 rounded-xl border border-zinc-900 bg-zinc-950/40">
+                      <div className="h-4 w-4 bg-zinc-800 rounded" />
+                      <div className="h-3 w-2/3 bg-zinc-800/40 rounded" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         ) : !task ? (
           <div className="flex flex-col items-center justify-center h-full text-zinc-500">
-            Task not found.
+            <FileText className="h-10 w-10 mb-3 text-zinc-700" />
+            <span className="text-sm font-semibold">Task not found</span>
+            <span className="text-xs text-zinc-600 mt-1">This task may have been deleted or is unavailable.</span>
           </div>
         ) : (
           <>
@@ -664,9 +751,10 @@ export default function TaskDetailPanel({
                 <div className="space-y-6">
                   {/* Log time form */}
                   <form
-                    onSubmit={handleLogTime}
+                    action={logTimeAction}
                     className="p-4 rounded-xl border border-zinc-900 bg-zinc-950/40 space-y-4"
                   >
+                    <input type="hidden" name="taskId" value={task._id} />
                     <h6 className="text-xs font-bold text-zinc-300 uppercase tracking-wide flex items-center gap-1.5">
                       <Clock className="h-4 w-4 text-indigo-400" />
                       Log Work Hours
@@ -679,6 +767,7 @@ export default function TaskDetailPanel({
                         <FieldContent>
                           <Input
                             type="number"
+                            name="hours"
                             placeholder="Hours, e.g. 2.5"
                             value={logHours}
                             onChange={(e) =>
@@ -693,6 +782,7 @@ export default function TaskDetailPanel({
                             className="bg-zinc-900/40 border-zinc-800 text-zinc-200 focus:border-zinc-700 rounded-xl h-9"
                             required
                           />
+                          <InputFieldError field="hours" state={logTimeState} />
                         </FieldContent>
                       </Field>
                       <Field>
@@ -702,11 +792,13 @@ export default function TaskDetailPanel({
                         <FieldContent>
                           <Input
                             type="date"
+                            name="date"
                             value={logDate}
                             onChange={(e) => setLogDate(e.target.value)}
                             className="bg-zinc-900/40 border-zinc-800 text-zinc-200 focus:border-zinc-700 rounded-xl h-9 cursor-pointer"
                             required
                           />
+                          <InputFieldError field="date" state={logTimeState} />
                         </FieldContent>
                       </Field>
                     </div>
@@ -717,19 +809,21 @@ export default function TaskDetailPanel({
                       <FieldContent>
                         <Input
                           type="text"
+                          name="note"
                           placeholder="What did you work on? E.g. Refactored controllers"
                           value={logNote}
                           onChange={(e) => setLogNote(e.target.value)}
                           className="bg-zinc-900/40 border-zinc-800 text-zinc-200 focus:border-zinc-700 rounded-xl h-9"
                         />
+                        <InputFieldError field="note" state={logTimeState} />
                       </FieldContent>
                     </Field>
                     <Button
                       type="submit"
-                      disabled={isPending || !logHours}
+                      disabled={isLoggingTimePending || !logHours}
                       className="w-full bg-linear-to-r from-indigo-500 to-violet-600 hover:from-indigo-600 hover:to-violet-700 text-white text-xs font-bold h-9 rounded-xl cursor-pointer"
                     >
-                      Log Time Entry
+                      {isLoggingTimePending ? "Logging..." : "Log Time Entry"}
                     </Button>
                   </form>
 

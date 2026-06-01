@@ -27,6 +27,9 @@ export async function getProjectById(id: string) {
   }
 }
 
+import { zodValidator } from "@/lib/zodValidator";
+import { projectValidationSchema } from "@/zod/project.validation";
+
 export async function createProject(prevState: any, formData: FormData) {
   try {
     const title = formData.get("title");
@@ -43,18 +46,29 @@ export async function createProject(prevState: any, formData: FormData) {
       client,
       startDate,
       endDate,
-      budget: budget ? Number(budget) : undefined,
+      budget: budget || undefined,
       status,
       description,
-      members: members ? JSON.parse(members as string) : [],
+      members: members || undefined,
     };
+
+    const validatedPayload = zodValidator(payload, projectValidationSchema);
+
+    if (!validatedPayload.success && validatedPayload.errors) {
+      return {
+        success: false,
+        message: "Validation failed",
+        formData: payload,
+        errors: validatedPayload.errors,
+      };
+    }
 
     const backendFormData = new FormData();
     const file = formData.get("file");
     if (file && file instanceof File && file.size > 0) {
       backendFormData.append("file", file);
     }
-    backendFormData.append("data", JSON.stringify(payload));
+    backendFormData.append("data", JSON.stringify(validatedPayload.data));
 
     const res = await serverFetch.post("/projects", {
       body: backendFormData,
@@ -82,18 +96,29 @@ export async function updateProject(id: string, prevState: any, formData: FormDa
       client,
       startDate,
       endDate,
-      budget: budget ? Number(budget) : undefined,
+      budget: budget || undefined,
       status,
       description,
-      members: members ? JSON.parse(members as string) : [],
+      members: members || undefined,
     };
+
+    const validatedPayload = zodValidator(payload, projectValidationSchema);
+
+    if (!validatedPayload.success && validatedPayload.errors) {
+      return {
+        success: false,
+        message: "Validation failed",
+        formData: payload,
+        errors: validatedPayload.errors,
+      };
+    }
 
     const backendFormData = new FormData();
     const file = formData.get("file");
     if (file && file instanceof File && file.size > 0) {
       backendFormData.append("file", file);
     }
-    backendFormData.append("data", JSON.stringify(payload));
+    backendFormData.append("data", JSON.stringify(validatedPayload.data));
 
     const res = await serverFetch.put(`/projects/${id}`, {
       body: backendFormData,

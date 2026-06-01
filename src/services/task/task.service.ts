@@ -23,6 +23,10 @@ export async function getTasksBySprint(sprintId: string) {
   }
 }
 
+import { zodValidator } from "@/lib/zodValidator";
+import { taskValidationSchema } from "@/zod/task.validation";
+import { timeLogValidationSchema } from "@/zod/timelog.validation";
+
 export async function createTask(
   _prevState: any,
   formData: FormData) {
@@ -36,6 +40,29 @@ export async function createTask(
   const assignees = formData.getAll("assignees") as string[];
   const subtasksRaw = formData.get("subtasks") as string;
 
+  const payload = {
+    title: title || undefined,
+    sprint: sprint || undefined,
+    description: description || undefined,
+    priority: priority || undefined,
+    estimate: estimate || undefined,
+    dueDate: dueDate || undefined,
+    assignees: assignees || [],
+    subtasks: subtasksRaw || undefined,
+    reviewRequired: reviewRequired ? "true" : "false",
+  };
+
+  const validatedPayload = zodValidator(payload, taskValidationSchema);
+
+  if (!validatedPayload.success && validatedPayload.errors) {
+    return {
+      success: false,
+      message: "Validation failed",
+      formData: payload,
+      errors: validatedPayload.errors,
+    };
+  }
+
   let subtasks = [];
   try {
     subtasks = subtasksRaw ? JSON.parse(subtasksRaw) : [];
@@ -47,15 +74,15 @@ export async function createTask(
     const res = await serverFetch.post("/tasks", {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        sprint,
-        title: title,
-        description: description,
-        priority: priority,
-        estimate: estimate ? Number(estimate) : undefined,
-        dueDate: dueDate,
-        assignees,
-        subtasks,
-        reviewRequired,
+        sprint: validatedPayload?.data?.sprint,
+        title: validatedPayload?.data?.title,
+        description: validatedPayload?.data?.description,
+        priority: validatedPayload?.data?.priority,
+        estimate: validatedPayload?.data?.estimate,
+        dueDate: validatedPayload?.data?.dueDate,
+        assignees: validatedPayload?.data?.assignees,
+        subtasks: validatedPayload?.data?.subtasks,
+        reviewRequired: validatedPayload?.data?.reviewRequired,
       }),
     });
     const result = await res.json();
@@ -92,6 +119,29 @@ export async function updateTask(
   const assignees = formData.getAll("assignees") as string[];
   const subtasksRaw = formData.get("subtasks") as string;
 
+  const payload = {
+    title: title || undefined,
+    sprint: sprint || undefined,
+    description: description || undefined,
+    priority: priority || undefined,
+    estimate: estimate || undefined,
+    dueDate: dueDate || undefined,
+    assignees: assignees || [],
+    subtasks: subtasksRaw || undefined,
+    reviewRequired: reviewRequired ? "true" : "false",
+  };
+
+  const validatedPayload = zodValidator(payload, taskValidationSchema);
+
+  if (!validatedPayload.success && validatedPayload.errors) {
+    return {
+      success: false,
+      message: "Validation failed",
+      formData: { ...payload, taskId },
+      errors: validatedPayload.errors,
+    };
+  }
+
   let subtasks = [];
   try {
     subtasks = subtasksRaw ? JSON.parse(subtasksRaw) : [];
@@ -103,15 +153,15 @@ export async function updateTask(
     const res = await serverFetch.put(`/tasks/${taskId}`, {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        sprint,
-        title: title,
-        description: description,
-        priority: priority || "Medium",
-        estimate: estimate ? Number(estimate) : undefined,
-        dueDate: dueDate || undefined,
-        assignees,
-        subtasks,
-        reviewRequired,
+        sprint: validatedPayload?.data?.sprint,
+        title: validatedPayload?.data?.title,
+        description: validatedPayload?.data?.description,
+        priority: validatedPayload?.data?.priority || "Medium",
+        estimate: validatedPayload?.data?.estimate,
+        dueDate: validatedPayload?.data?.dueDate || undefined,
+        assignees: validatedPayload?.data?.assignees,
+        subtasks: validatedPayload?.data?.subtasks,
+        reviewRequired: validatedPayload?.data?.reviewRequired,
       }),
     });
     const result = await res.json();
@@ -185,13 +235,39 @@ export async function addAttachment(taskId: string, formData: FormData) {
 }
 
 export async function logTime(
-  taskId: string,
-  data: { hours: number; date: string; note?: string }
+  prevState: any,
+  formData: FormData
 ) {
+  const taskId = formData.get("taskId") as string;
+  const hours = formData.get("hours") as string;
+  const date = formData.get("date") as string;
+  const note = formData.get("note") as string;
+
+  const payload = {
+    hours: hours || undefined,
+    date: date || undefined,
+    note: note || undefined,
+  };
+
+  const validatedPayload = zodValidator(payload, timeLogValidationSchema);
+
+  if (!validatedPayload.success && validatedPayload.errors) {
+    return {
+      success: false,
+      message: "Validation failed",
+      formData: { ...payload, taskId },
+      errors: validatedPayload.errors,
+    };
+  }
+
   try {
     const res = await serverFetch.post(`/tasks/${taskId}/timelogs`, {
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        hours: validatedPayload?.data?.hours,
+        date: validatedPayload?.data?.date,
+        note: validatedPayload?.data?.note,
+      }),
     });
     const result = await res.json();
     return result;

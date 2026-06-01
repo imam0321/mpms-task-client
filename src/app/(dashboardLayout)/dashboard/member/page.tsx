@@ -1,4 +1,3 @@
-import React from "react";
 import { ListTodo, Clock, CheckCircle2, AlertCircle, PlayCircle, PlusCircle, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 

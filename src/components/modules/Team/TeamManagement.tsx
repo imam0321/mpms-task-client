@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
+import React, { useState, useTransition, useEffect, useActionState } from "react";
+import InputFieldError from "@/components/shared/InputFieldError";
 import { useRouter } from "next/navigation";
 import {
   Search, Plus, Users, Loader2, Edit2, Trash2, X, Shield, Mail,
@@ -42,6 +43,42 @@ export default function TeamManagement({ initialUsers }: TeamManagementProps) {
 
   const [userToDelete, setUserToDelete] = useState<IUser | null>(null);
 
+  const [state, formAction, isPendingAction] = useActionState(
+    async (prevState: any, formData: FormData) => {
+      if (editingUser) {
+        return updateMember(prevState, formData);
+      } else {
+        return addMember(prevState, formData);
+      }
+    },
+    null
+  );
+
+  useEffect(() => {
+    if (state) {
+      if (state.success) {
+        toast.success(
+          editingUser ? "Member updated successfully!" : "Member added successfully!"
+        );
+        setIsOpen(false);
+        resetForm();
+        router.refresh();
+      } else {
+        if (state.message && state.message !== "Validation failed") {
+          toast.error(state.message);
+        }
+        if (state.formData) {
+          setName((state.formData.name as string) || "");
+          setEmail((state.formData.email as string) || "");
+          setPassword((state.formData.password as string) || "");
+          setRole((state.formData.role as UserRole) || "Member");
+          setDesignation((state.formData.designation as string) || "");
+          setDepartment((state.formData.department as string) || "");
+        }
+      }
+    }
+  }, [state, router]);
+
   // Filter users client-side
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
@@ -78,59 +115,13 @@ export default function TeamManagement({ initialUsers }: TeamManagementProps) {
     setIsOpen(true);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name.trim() || !email.trim()) {
-      toast.error("Name and email are required.");
-      return;
-    }
-    if (!editingUser && !password.trim()) {
-      toast.error("Password is required for new members.");
-      return;
-    }
-
-    startTransition(async () => {
-      try {
-        let res;
-        if (editingUser) {
-          res = await updateMember(editingUser._id, {
-            name,
-            role,
-            designation: designation || undefined,
-            department: department || undefined,
-          });
-        } else {
-          res = await addMember({
-            name,
-            email,
-            password,
-            role,
-            designation: designation || undefined,
-            department: department || undefined,
-          });
-        }
-
-        if (res?.success) {
-          toast.success(
-            editingUser ? "Member updated successfully!" : "Member added successfully!"
-          );
-          setIsOpen(false);
-          resetForm();
-          router.refresh();
-        } else {
-          toast.error(res?.message || "Failed to save member");
-        }
-      } catch (err: any) {
-        toast.error(err?.message || "An error occurred");
-      }
-    });
-  };
+  // handleSubmit replaced by formAction action on submit
 
   const handleDelete = () => {
     if (!userToDelete) return;
     startTransition(async () => {
       try {
-        const res = await removeMember(userToDelete._id);
+        const res = await removeMember(userToDelete._id!);
         if (res?.success) {
           toast.success("Member removed successfully!");
           setUserToDelete(null);
@@ -431,9 +422,13 @@ export default function TeamManagement({ initialUsers }: TeamManagementProps) {
           </DialogHeader>
 
           <form
-            onSubmit={handleSubmit}
+            action={formAction}
             className="flex-1 overflow-y-auto p-6 space-y-5 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent scroll-smooth max-h-[55vh]"
           >
+            {editingUser && (
+              <input type="hidden" name="userId" value={editingUser._id} />
+            )}
+            <input type="hidden" name="role" value={role} />
             {/* Name */}
             <Field>
               <FieldLabel className="text-xs uppercase tracking-wider text-zinc-500 font-bold flex items-center gap-1">
@@ -442,12 +437,14 @@ export default function TeamManagement({ initialUsers }: TeamManagementProps) {
               <FieldContent>
                 <Input
                   type="text"
+                  name="name"
                   placeholder="Enter member name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="bg-zinc-900/40 border-zinc-800 text-zinc-200 focus:border-zinc-700 rounded-xl h-9"
                   required
                 />
+                <InputFieldError field="name" state={state} />
               </FieldContent>
             </Field>
 
@@ -459,6 +456,7 @@ export default function TeamManagement({ initialUsers }: TeamManagementProps) {
               <FieldContent>
                 <Input
                   type="email"
+                  name="email"
                   placeholder="Enter email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -466,6 +464,7 @@ export default function TeamManagement({ initialUsers }: TeamManagementProps) {
                   required
                   disabled={!!editingUser}
                 />
+                <InputFieldError field="email" state={state} />
               </FieldContent>
             </Field>
 
@@ -478,12 +477,14 @@ export default function TeamManagement({ initialUsers }: TeamManagementProps) {
                 <FieldContent>
                   <Input
                     type="password"
+                    name="password"
                     placeholder="Set a password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="bg-zinc-900/40 border-zinc-800 text-zinc-200 focus:border-zinc-700 rounded-xl h-9"
                     required
                   />
+                  <InputFieldError field="password" state={state} />
                 </FieldContent>
               </Field>
             )}
@@ -501,8 +502,8 @@ export default function TeamManagement({ initialUsers }: TeamManagementProps) {
                       type="button"
                       onClick={() => setRole(roleVal)}
                       className={`py-2 rounded-lg text-xs font-semibold uppercase tracking-wider border transition-all duration-150 cursor-pointer flex items-center justify-center gap-1.5 ${role === roleVal
-                          ? "bg-indigo-600/10 text-indigo-400 border-indigo-500/30"
-                          : "border-transparent text-zinc-500 hover:text-zinc-300"
+                        ? "bg-indigo-600/10 text-indigo-400 border-indigo-500/30"
+                        : "border-transparent text-zinc-500 hover:text-zinc-300"
                         }`}
                     >
                       {roleIcons[roleVal]}
@@ -510,6 +511,7 @@ export default function TeamManagement({ initialUsers }: TeamManagementProps) {
                     </button>
                   ))}
                 </div>
+                <InputFieldError field="role" state={state} />
               </FieldContent>
             </Field>
 
@@ -522,11 +524,13 @@ export default function TeamManagement({ initialUsers }: TeamManagementProps) {
                 <FieldContent>
                   <Input
                     type="text"
+                    name="designation"
                     placeholder="e.g. Senior Developer"
                     value={designation}
                     onChange={(e) => setDesignation(e.target.value)}
                     className="bg-zinc-900/40 border-zinc-800 text-zinc-200 focus:border-zinc-700 rounded-xl h-9"
                   />
+                  <InputFieldError field="designation" state={state} />
                 </FieldContent>
               </Field>
               <Field>
@@ -536,11 +540,13 @@ export default function TeamManagement({ initialUsers }: TeamManagementProps) {
                 <FieldContent>
                   <Input
                     type="text"
+                    name="department"
                     placeholder="e.g. Engineering"
                     value={department}
                     onChange={(e) => setDepartment(e.target.value)}
                     className="bg-zinc-900/40 border-zinc-800 text-zinc-200 focus:border-zinc-700 rounded-xl h-9"
                   />
+                  <InputFieldError field="department" state={state} />
                 </FieldContent>
               </Field>
             </div>
@@ -555,11 +561,10 @@ export default function TeamManagement({ initialUsers }: TeamManagementProps) {
             </DialogClose>
             <Button
               type="submit"
-              onClick={handleSubmit}
-              disabled={isPending}
+              disabled={isPendingAction}
               className="w-1/2 bg-linear-to-r from-indigo-500 to-violet-600 hover:from-indigo-600 hover:to-violet-700 text-white cursor-pointer h-9 rounded-xl text-xs font-bold shadow-md shadow-indigo-500/10"
             >
-              {isPending ? (
+              {isPendingAction ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin mr-2" /> Saving...
                 </>

@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field, FieldLabel, FieldContent } from "@/components/ui/field";
+import InputFieldError from "@/components/shared/InputFieldError";
 import {
   Dialog,
   DialogContent,
@@ -45,7 +46,7 @@ export default function SprintFormDialog({
       toast.success(state.message || (isEdit ? "Project updated successfully" : "Project created successfully"));
       onSuccess();
       onClose();
-    } else if (state && !state.success) {
+    } else if (state && !state.success && state.message && state.message !== "Validation failed") {
       toast.error(state.message || "Failed to save project");
     }
   }, [state, onSuccess, onClose, isEdit]);
@@ -73,9 +74,7 @@ export default function SprintFormDialog({
           {isEdit && (
             <input type="hidden" name="sprintId" value={sprint._id} />
           )}
-          {!isEdit && (
-            <input type="hidden" name="projectId" value={projectId} />
-          )}
+          <input type="hidden" name="projectId" value={projectId} />
 
           {/* Sprint Title */}
           <Field>
@@ -91,6 +90,7 @@ export default function SprintFormDialog({
                 className={`bg-zinc-900/40 border-zinc-800 text-zinc-200 focus:border-zinc-700 rounded-xl h-9 `}
                 required
               />
+              <InputFieldError field="title" state={state} />
             </FieldContent>
           </Field>
 
@@ -111,6 +111,7 @@ export default function SprintFormDialog({
                   }
                   className="bg-zinc-900/40 border-zinc-800 text-zinc-200 focus:border-zinc-700 rounded-xl h-9 cursor-pointer"
                 />
+                <InputFieldError field="startDate" state={state} />
               </FieldContent>
             </Field>
 
@@ -129,6 +130,7 @@ export default function SprintFormDialog({
                   }
                   className={`bg-zinc-900/40 border-zinc-800 text-zinc-200 focus:border-zinc-700 rounded-xl h-9 cursor-pointer`}
                 />
+                <InputFieldError field="endDate" state={state} />
               </FieldContent>
             </Field>
           </div>

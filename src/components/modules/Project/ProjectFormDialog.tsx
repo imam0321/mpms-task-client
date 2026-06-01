@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import SingleImageUploader from "@/components/ui/SingleImageUploader";
 import { IProject, IUser, ProjectStatus } from "@/types/api.types";
 import { createProject, updateProject } from "@/services/project/project.service";
+import InputFieldError from "@/components/shared/InputFieldError";
 
 interface ProjectFormDialogProps {
   open: boolean;
@@ -37,7 +38,7 @@ export default function ProjectFormDialog({
     if (open) {
       if (project) {
         setStatus(project.status || "planned");
-        setSelectedMemberIds(project.members?.map((m) => m._id) || []);
+        setSelectedMemberIds(project.members?.map((m) => m._id).filter((id): id is string => !!id) || []);
       } else {
         setStatus("planned");
         setSelectedMemberIds([]);
@@ -62,7 +63,7 @@ export default function ProjectFormDialog({
       toast.success(state.message || (isEdit ? "Project updated successfully" : "Project created successfully"));
       onSuccess();
       onClose();
-    } else if (state && !state.success) {
+    } else if (state && !state.success && state.message && state.message !== "Validation failed") {
       toast.error(state.message || "Failed to save project");
     }
   }, [state, onSuccess, onClose, isEdit]);
@@ -138,6 +139,7 @@ export default function ProjectFormDialog({
                 className="bg-zinc-900/40 border-zinc-800 text-zinc-200 focus:border-zinc-700 rounded-xl h-9"
                 required
               />
+              <InputFieldError field="title" state={state} />
             </FieldContent>
           </Field>
 
@@ -155,6 +157,7 @@ export default function ProjectFormDialog({
                 className="bg-zinc-900/40 border-zinc-800 text-zinc-200 focus:border-zinc-700 rounded-xl h-9"
                 required
               />
+              <InputFieldError field="client" state={state} />
             </FieldContent>
           </Field>
 
@@ -172,6 +175,7 @@ export default function ProjectFormDialog({
                   className="bg-zinc-900/40 border-zinc-800 text-zinc-200 focus:border-zinc-700 rounded-xl h-9 cursor-pointer"
                   required
                 />
+                <InputFieldError field="startDate" state={state} />
               </FieldContent>
             </Field>
 
@@ -187,6 +191,7 @@ export default function ProjectFormDialog({
                   className="bg-zinc-900/40 border-zinc-800 text-zinc-200 focus:border-zinc-700 rounded-xl h-9 cursor-pointer"
                   required
                 />
+                <InputFieldError field="endDate" state={state} />
               </FieldContent>
             </Field>
           </div>
@@ -203,6 +208,7 @@ export default function ProjectFormDialog({
                 className="bg-zinc-900/40 border-zinc-800 text-zinc-200 focus:border-zinc-700 rounded-xl h-9"
                 min="0"
               />
+              <InputFieldError field="budget" state={state} />
             </FieldContent>
           </Field>
 
@@ -238,6 +244,7 @@ export default function ProjectFormDialog({
                 defaultValue={project?.description || ""}
                 className="w-full bg-zinc-900/40 border border-zinc-800 text-zinc-200 focus:border-zinc-700 p-2.5 rounded-xl h-24 text-sm outline-none transition-colors scrollbar-thin"
               />
+              <InputFieldError field="description" state={state} />
             </FieldContent>
           </Field>
 
@@ -276,11 +283,11 @@ export default function ProjectFormDialog({
                   <div className="text-center p-4 text-xs text-zinc-500">No users found.</div>
                 ) : (
                   filteredUsers.map((user) => {
-                    const isSelected = selectedMemberIds.includes(user._id);
+                    const isSelected = selectedMemberIds.includes(user?._id!);
                     return (
                       <div
                         key={user._id}
-                        onClick={() => toggleMemberSelection(user._id)}
+                        onClick={() => toggleMemberSelection(user?._id!)}
                         className={`flex items-center gap-3 p-2.5 transition-all duration-150 cursor-pointer hover:bg-zinc-900/30 ${isSelected ? "bg-indigo-950/10 border-l-2 border-l-indigo-500" : ""
                           }`}
                       >

@@ -12,6 +12,9 @@ export async function getSprintsByProject(projectId: string) {
   }
 }
 
+import { zodValidator } from "@/lib/zodValidator";
+import { sprintValidationSchema } from "@/zod/sprint.validation";
+
 export async function createSprint(
   _prevState: any,
   formData: FormData
@@ -21,14 +24,27 @@ export async function createSprint(
   const endDate = formData.get("endDate") as string;
   const projectId = formData.get("projectId") as string;
 
+  const payload = { projectId, title, startDate, endDate };
+
+  const validatedPayload = zodValidator(payload, sprintValidationSchema);
+
+  if (!validatedPayload.success && validatedPayload.errors) {
+    return {
+      success: false,
+      message: "Validation failed",
+      formData: { ...payload, sprintId: "" },
+      errors: validatedPayload.errors,
+    };
+  }
+
   try {
     const res = await serverFetch.post("/sprints", {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        project: projectId,
-        title: title,
-        startDate: startDate,
-        endDate: endDate,
+        project: validatedPayload?.data?.projectId,
+        title: validatedPayload?.data?.title,
+        startDate: validatedPayload?.data?.startDate,
+        endDate: validatedPayload?.data?.endDate,
       }),
     });
     const result = await res.json();
@@ -48,9 +64,23 @@ export async function updateSprint(
   formData: FormData
 ) {
   const sprintId = formData.get("sprintId") as string;
+  const projectId = formData.get("projectId") as string;
   const title = formData.get("title") as string;
   const startDate = formData.get("startDate") as string;
   const endDate = formData.get("endDate") as string;
+
+  const payload = { projectId, title, startDate, endDate };
+
+  const validatedPayload = zodValidator(payload, sprintValidationSchema);
+
+  if (!validatedPayload.success && validatedPayload.errors) {
+    return {
+      success: false,
+      message: "Validation failed",
+      formData: { ...payload, sprintId },
+      errors: validatedPayload.errors,
+    };
+  }
 
   try {
     const res = await serverFetch.put(`/sprints/${sprintId}`, {

@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useActionState } from "react";
+import React, { useState, useEffect, useActionState, useRef } from "react";
 import { Plus, X, Users, Loader2, ListTodo, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field, FieldLabel, FieldContent } from "@/components/ui/field";
+import InputFieldError from "@/components/shared/InputFieldError";
 import {
   Dialog,
   DialogContent,
@@ -69,7 +70,12 @@ export default function TaskFormDialog({
     }
   }, [isOpen, editingTask]);
 
+  const prevStateRef = useRef(state);
+
   useEffect(() => {
+    if (state === prevStateRef.current) return;
+    prevStateRef.current = state;
+
     if (!state) return;
     if (!state.message) return;
 
@@ -77,7 +83,7 @@ export default function TaskFormDialog({
       toast.success(state.message);
       onSuccess();
       onOpenChange(false);
-    } else if (state.message) {
+    } else if (state.message && state.message !== "Validation failed") {
       toast.error(state.message);
     }
   }, [state, onOpenChange, onSuccess]);
@@ -155,6 +161,7 @@ export default function TaskFormDialog({
                   </option>
                 ))}
               </select>
+              <InputFieldError field="sprint" state={state} />
             </FieldContent>
           </Field>
 
@@ -172,6 +179,7 @@ export default function TaskFormDialog({
                 className={`bg-zinc-900/40 border-zinc-800 text-zinc-200 focus:border-zinc-700 rounded-xl h-9`}
                 required
               />
+              <InputFieldError field="title" state={state} />
             </FieldContent>
           </Field>
 
@@ -188,6 +196,7 @@ export default function TaskFormDialog({
                 rows={3}
                 className="w-full bg-zinc-900/40 border border-zinc-800 text-zinc-200 text-sm rounded-xl p-3 focus:outline-hidden focus:border-zinc-700 placeholder-zinc-600"
               />
+              <InputFieldError field="description" state={state} />
             </FieldContent>
           </Field>
 
@@ -208,6 +217,7 @@ export default function TaskFormDialog({
                   <option value="High">High</option>
                   <option value="Critical">Critical</option>
                 </select>
+                <InputFieldError field="priority" state={state} />
               </FieldContent>
             </Field>
 
@@ -224,6 +234,7 @@ export default function TaskFormDialog({
                   min={0}
                   className="bg-zinc-900/40 border-zinc-800 text-zinc-200 focus:border-zinc-700 rounded-xl h-9"
                 />
+                <InputFieldError field="estimate" state={state} />
               </FieldContent>
             </Field>
 
@@ -242,6 +253,7 @@ export default function TaskFormDialog({
                   }
                   className="bg-zinc-900/40 border-zinc-800 text-zinc-200 focus:border-zinc-700 rounded-xl h-9 cursor-pointer"
                 />
+                <InputFieldError field="dueDate" state={state} />
               </FieldContent>
             </Field>
           </div>
