@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { formatDate } from "@/lib/formatDate";
 import { IProject } from "@/types/api.types";
 import { Calendar, DollarSign, Edit, Trash2, Briefcase } from "lucide-react";
@@ -12,13 +13,17 @@ interface ProjectCardProps {
 }
 
 export default function ProjectCard({ project, onEdit, onDelete, basePath }: ProjectCardProps) {
-  const start = new Date(project.startDate).getTime();
-  const end = new Date(project.endDate).getTime();
-  const now = new Date().getTime();
-  const total = end - start;
-  const elapsed = now - start;
-  const progress = total > 0 ? Math.min(Math.round((elapsed / total) * 100), 100) : 0;
-  const percentage = progress < 0 ? 0 : progress;
+  const [percentage, setPercentage] = useState(0);
+
+  useEffect(() => {
+    const start = new Date(project.startDate).getTime();
+    const end = new Date(project.endDate).getTime();
+    const now = new Date().getTime();
+    const total = end - start;
+    const elapsed = now - start;
+    const progress = total > 0 ? Math.min(Math.round((elapsed / total) * 100), 100) : 0;
+    setPercentage(progress < 0 ? 0 : progress);
+  }, [project.startDate, project.endDate]);
 
   const statusConfig = {
     planned: {

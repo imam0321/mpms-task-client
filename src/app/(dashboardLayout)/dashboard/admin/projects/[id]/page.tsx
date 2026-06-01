@@ -1,8 +1,10 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { getProjectById } from "@/services/project/project.service";
 import { getUserInfo } from "@/services/auth/getUserInfo";
 import ProjectDetailView from "@/components/modules/Project/ProjectDetailView";
 import { notFound } from "next/navigation";
+import ProjectDetailPageSkeleton from "@/components/modules/Project/ProjectSkeleton/ProjectDetailPageSkeleton";
+import { IUser } from "@/types/api.types";
 
 interface Params {
   id: string;
@@ -14,21 +16,23 @@ export default async function AdminProjectDetailPage({
   params: Promise<Params>;
 }) {
   const { id } = await params;
-  
-  const projectRes = await getProjectById(id);
-  if (!projectRes?.success || !projectRes.data) {
+
+  const project = await getProjectById(id);
+  if (!project?.success || !project.data) {
     notFound();
   }
-  
+
   const currentUser = await getUserInfo();
 
   return (
     <div className="space-y-6 p-1">
-      <ProjectDetailView
-        project={projectRes.data}
-        currentUser={currentUser as any}
-        backPath="/dashboard/admin/projects"
-      />
+      <Suspense fallback={<ProjectDetailPageSkeleton />}>
+        <ProjectDetailView
+          project={project.data}
+          currentUser={currentUser as IUser}
+          backPath={`/dashboard/${(currentUser?.role) && (currentUser?.role).toLowerCase()}`}
+        />
+      </Suspense>
     </div>
   );
 }

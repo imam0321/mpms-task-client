@@ -19,6 +19,8 @@ interface SprintManagerProps {
   onRefresh: () => Promise<void>;
   onAddTask: (sprintId: string) => void;
   onTaskClick: (task: ITask) => void;
+  onEditTask?: (task: ITask) => void;
+  onDeleteTask?: (task: ITask) => void;
 }
 
 export default function SprintManager({
@@ -29,6 +31,8 @@ export default function SprintManager({
   onRefresh,
   onAddTask,
   onTaskClick,
+  onEditTask,
+  onDeleteTask,
 }: SprintManagerProps) {
   const [isPending, startTransition] = useTransition();
   const [openModal, setOpenModal] = useState(false);
@@ -150,6 +154,8 @@ export default function SprintManager({
               onReorderSprint={canManage ? handleReorderSprint : undefined}
               onAddTask={canManage ? onAddTask : undefined}
               onTaskClick={onTaskClick}
+              onEditTask={onEditTask}
+              onDeleteTask={onDeleteTask}
             />
           ))}
         </div>

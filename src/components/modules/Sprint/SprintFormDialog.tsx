@@ -53,7 +53,7 @@ export default function SprintFormDialog({
   const handleClose = () => {
     onClose();
   };
-console.log(state)
+  console.log(state)
   return (
     <Dialog open={open} onOpenChange={(openVal) => !openVal && handleClose()}>
       <DialogContent onInteractOutside={(e) => e.preventDefault()} className="w-full sm:max-w-lg bg-zinc-950 border border-zinc-900 p-0 flex flex-col max-h-[90vh] shadow-2xl rounded-2xl animate-in fade-in zoom-in duration-200">

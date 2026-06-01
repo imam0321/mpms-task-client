@@ -6,7 +6,7 @@ import ProjectManagement from "@/components/modules/Project/ProjectManagement";
 import { IProject } from "@/types/api.types";
 import PaginationHelper from "@/components/shared/PaginationHelper";
 import { Suspense } from "react";
-import StatsCardSkeleton from "@/components/modules/Project/StatsCardSkeleton";
+import StatsCardSkeleton from "@/components/modules/Project/ProjectSkeleton/StatsCardSkeleton";
 
 export default async function AdminDashboard({
   searchParams,

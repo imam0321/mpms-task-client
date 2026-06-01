@@ -20,6 +20,8 @@ interface SprintSectionProps {
   onReorderSprint?: (sprint: ISprint, direction: "up" | "down") => void;
   onAddTask?: (sprintId: string) => void;
   onTaskClick: (task: ITask) => void;
+  onEditTask?: (task: ITask) => void;
+  onDeleteTask?: (task: ITask) => void;
 }
 
 export default function SprintSection({
@@ -32,6 +34,8 @@ export default function SprintSection({
   onReorderSprint,
   onAddTask,
   onTaskClick,
+  onEditTask,
+  onDeleteTask,
 }: SprintSectionProps) {
   const [isExpanded, setIsExpanded] = useState(index === 0); 
 
@@ -225,6 +229,8 @@ export default function SprintSection({
                             key={task._id}
                             task={task}
                             onClick={() => onTaskClick(task)}
+                            onEdit={onEditTask}
+                            onDelete={onDeleteTask}
                           />
                         ))
                       )}

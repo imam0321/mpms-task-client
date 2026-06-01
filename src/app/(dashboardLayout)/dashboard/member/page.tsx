@@ -1,5 +1,6 @@
 import React from "react";
 import { ListTodo, Clock, CheckCircle2, AlertCircle, PlayCircle, PlusCircle, ArrowUpRight } from "lucide-react";
+import Link from "next/link";
 
 export default function MemberDashboard() {
   const stats = [
@@ -80,9 +81,9 @@ export default function MemberDashboard() {
         <div className="md:col-span-2 rounded-2xl border border-zinc-800 bg-zinc-950/40 p-6 backdrop-blur-md">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold text-zinc-200">My Task Queue</h2>
-            <button className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-medium transition-colors cursor-pointer">
-              Go to Task Board <ArrowUpRight className="h-3 w-3" />
-            </button>
+            <Link href="/dashboard/member/projects" className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-medium transition-colors cursor-pointer">
+              Go to Projects <ArrowUpRight className="h-3 w-3" />
+            </Link>
           </div>
           <div className="space-y-3">
             {myTasks.map((task, i) => (

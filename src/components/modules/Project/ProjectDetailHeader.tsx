@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
-import { Calendar, DollarSign, Briefcase, Users, Clock, ArrowLeft } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Calendar, DollarSign, Briefcase, Users, Clock, ArrowLeft, Edit } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { IProject } from "@/types/api.types";
@@ -10,16 +10,33 @@ import { formatDate } from "@/lib/formatDate";
 interface ProjectDetailHeaderProps {
   project: IProject;
   backPath: string;
+  onEdit?: () => void;
+  taskPercentage?: number;
+  totalTasks?: number;
 }
 
-export default function ProjectDetailHeader({ project, backPath }: ProjectDetailHeaderProps) {
-  const start = new Date(project.startDate).getTime();
-  const end = new Date(project.endDate).getTime();
-  const now = new Date().getTime();
-  const total = end - start;
-  const elapsed = now - start;
-  const progress = total > 0 ? Math.min(Math.round((elapsed / total) * 100), 100) : 0;
-  const percentage = progress < 0 ? 0 : progress;
+export default function ProjectDetailHeader({
+  project,
+  backPath,
+  onEdit,
+  taskPercentage = 0,
+  totalTasks = 0,
+}: ProjectDetailHeaderProps) {
+  const [percentage, setPercentage] = useState(0);
+
+  useEffect(() => {
+    if (totalTasks > 0) {
+      setPercentage(taskPercentage);
+    } else {
+      const start = new Date(project.startDate).getTime();
+      const end = new Date(project.endDate).getTime();
+      const now = new Date().getTime();
+      const total = end - start;
+      const elapsed = now - start;
+      const progress = total > 0 ? Math.min(Math.round((elapsed / total) * 100), 100) : 0;
+      setPercentage(progress < 0 ? 0 : progress);
+    }
+  }, [project.startDate, project.endDate, taskPercentage, totalTasks]);
 
   const statusConfig = {
     planned: {
@@ -88,14 +105,26 @@ export default function ProjectDetailHeader({ project, backPath }: ProjectDetail
         {/* Project Content */}
         <div className="flex-1 flex flex-col justify-between gap-6">
           <div className="space-y-3">
-            <div>
-              <div className="flex items-center gap-2 text-xs text-indigo-400 font-semibold uppercase tracking-wider">
-                <Briefcase className="h-3.5 w-3.5" />
-                <span>{project.client}</span>
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-2 text-xs text-indigo-400 font-semibold uppercase tracking-wider">
+                  <Briefcase className="h-3.5 w-3.5" />
+                  <span>{project.client}</span>
+                </div>
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-100 tracking-tight mt-1">
+                  {project.title}
+                </h1>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-100 tracking-tight mt-1">
-                {project.title}
-              </h1>
+              {onEdit && (
+                <button
+                  type="button"
+                  onClick={onEdit}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 text-xs font-bold text-zinc-300 hover:text-indigo-400 hover:border-indigo-500/30 transition-all duration-150 cursor-pointer"
+                >
+                  <Edit className="h-3.5 w-3.5" />
+                  <span>Edit Project</span>
+                </button>
+              )}
             </div>
 
             {project.description ? (
@@ -141,7 +170,7 @@ export default function ProjectDetailHeader({ project, backPath }: ProjectDetail
 
             <div className="space-y-1">
               <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-zinc-500">
-                <span>Timeline</span>
+                <span>{totalTasks > 0 ? "Task Progress" : "Timeline"}</span>
                 <span className="text-zinc-400 font-semibold">{percentage}%</span>
               </div>
               <div className="h-2 w-full overflow-hidden rounded-full border border-zinc-800 bg-zinc-900/60 mt-1.5">
