@@ -14,6 +14,11 @@ import { IProject, ITask, ITimeLog, IUser } from "@/types/api.types";
 import { getAllTasks } from "@/services/task/task.service";
 import { createTimeLog, deleteTimeLog, getTimeLogsByTask } from "@/services/timelog/timelog.service";
 import { formatDate } from "@/lib/formatDate";
+import TimeLogSkeleton from "./TimeLogSkeleton";
+
+function getLogDescription(log: ITimeLog): string | undefined {
+  return log.description || (log as ITimeLog & { note?: string }).note;
+}
 
 interface TimeLogManagementProps {
   projects: IProject[];
@@ -49,7 +54,10 @@ export default function TimeLogManagement({ projects, currentUser }: TimeLogMana
       if (state.success) {
         toast.success("Time log entry recorded!");
         setActiveLogTaskId(null);
-        const taskId = state.formData?.task || state.data?.task;
+        const taskId =
+          (state.formData as { task?: string })?.task ||
+          (state.data as { task?: string })?.task ||
+          activeLogTaskId;
         if (taskId) {
           fetchTaskLogs(taskId);
         }
@@ -232,11 +240,8 @@ export default function TimeLogManagement({ projects, currentUser }: TimeLogMana
             Please choose a project to view task logs or submit work hour records.
           </p>
         </div>
-      ) : isLoadingTasks ? (
-        <div className="flex flex-col items-center justify-center py-20">
-          <Loader2 className="h-8 w-8 text-indigo-500 animate-spin mb-3" />
-          <span className="text-zinc-500 text-sm font-semibold">Loading project tasks...</span>
-        </div>
+      ) : isLoadingTasks || isPending ? (
+        <TimeLogSkeleton />
       ) : tasks.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 rounded-2xl border border-dashed border-zinc-800 bg-zinc-950/20 text-center p-6">
           <ClipboardList className="h-10 w-10 text-zinc-600 mb-3" />
@@ -334,8 +339,6 @@ export default function TimeLogManagement({ projects, currentUser }: TimeLogMana
                                 placeholder="E.g. 2.5"
                                 value={hours}
                                 onChange={(e) => setHours(e.target.value === "" ? "" : Number(e.target.value))}
-                                step={0.5}
-                                min={0.1}
                                 className="bg-zinc-900/40 border-zinc-800 text-zinc-200 focus:border-zinc-700 rounded-xl h-8.5 text-xs"
                                 required
                               />
@@ -399,9 +402,13 @@ export default function TimeLogManagement({ projects, currentUser }: TimeLogMana
                       className="px-5 pb-5 pt-3 border-t border-zinc-900 bg-zinc-950/20"
                     >
                       {loadingLogs[task._id] ? (
-                        <div className="flex items-center gap-2 py-4 text-xs text-zinc-500">
-                          <Loader2 className="h-4 w-4 animate-spin text-indigo-500" />
-                          <span>Fetching time logs...</span>
+                        <div className="space-y-2 py-2 animate-pulse">
+                          {Array.from({ length: 2 }).map((_, i) => (
+                            <div
+                              key={i}
+                              className="h-14 rounded-xl border border-zinc-900 bg-zinc-950/40"
+                            />
+                          ))}
                         </div>
                       ) : logs.length === 0 ? (
                         <div className="text-zinc-600 text-xs py-4 flex items-center gap-1.5 font-medium">
@@ -427,8 +434,10 @@ export default function TimeLogManagement({ projects, currentUser }: TimeLogMana
                                   </div>
                                   <div>
                                     <span className="font-bold text-zinc-200">{logUser?.name || "Team Member"}</span>
-                                    {log.description && (
-                                      <p className="text-[10px] text-zinc-500 mt-0.5 leading-snug">{log.description}</p>
+                                    {getLogDescription(log) && (
+                                      <p className="text-[10px] text-zinc-500 mt-0.5 leading-snug">
+                                        {getLogDescription(log)}
+                                      </p>
                                     )}
                                   </div>
                                 </div>

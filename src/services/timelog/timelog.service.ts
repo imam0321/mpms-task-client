@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import { serverFetch } from "@/lib/server-fetch";
@@ -25,9 +26,10 @@ export async function createTimeLog(
   const description = formData.get("description") as string;
 
   const payload = {
-    hours: hours || undefined,
-    date: date || undefined,
-    note: description || undefined,
+    task,
+    hours: hours ?? "",
+    date: date ?? "",
+    description: description || "",
   };
 
   const validatedPayload = zodValidator(payload, timeLogValidationSchema);
@@ -36,7 +38,7 @@ export async function createTimeLog(
     return {
       success: false,
       message: "Validation failed",
-      formData: { ...payload, task, description },
+      formData: payload,
       errors: validatedPayload.errors,
     };
   }
@@ -45,10 +47,10 @@ export async function createTimeLog(
     const res = await serverFetch.post("/timelogs", {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        task,
-        hours: validatedPayload?.data?.hours,
-        date: validatedPayload?.data?.date,
-        description: validatedPayload?.data?.note,
+        task: validatedPayload.data?.task,
+        hours: validatedPayload.data?.hours,
+        date: validatedPayload.data?.date,
+        note: validatedPayload.data?.description || undefined,
       }),
     });
     const result = await res.json();

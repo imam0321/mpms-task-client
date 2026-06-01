@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import { serverFetch } from "@/lib/server-fetch";
@@ -244,9 +245,10 @@ export async function logTime(
   const note = formData.get("note") as string;
 
   const payload = {
-    hours: hours || undefined,
-    date: date || undefined,
-    note: note || undefined,
+    task: taskId,
+    hours: hours ?? "",
+    date: date ?? "",
+    description: note || "",
   };
 
   const validatedPayload = zodValidator(payload, timeLogValidationSchema);
@@ -255,8 +257,15 @@ export async function logTime(
     return {
       success: false,
       message: "Validation failed",
-      formData: { ...payload, taskId },
-      errors: validatedPayload.errors,
+      formData: {
+        taskId,
+        hours: payload.hours,
+        date: payload.date,
+        note: payload.description,
+      },
+      errors: validatedPayload.errors.map((err) =>
+        err.field === "description" ? { ...err, field: "note" } : err
+      ),
     };
   }
 
@@ -264,9 +273,9 @@ export async function logTime(
     const res = await serverFetch.post(`/tasks/${taskId}/timelogs`, {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        hours: validatedPayload?.data?.hours,
-        date: validatedPayload?.data?.date,
-        note: validatedPayload?.data?.note,
+        hours: Number(validatedPayload.data?.hours),
+        date: validatedPayload.data?.date,
+        note: validatedPayload.data?.description || undefined,
       }),
     });
     const result = await res.json();

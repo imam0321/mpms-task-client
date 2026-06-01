@@ -12,6 +12,7 @@ import { IProject, IUser } from "@/types/api.types";
 import {
   getOverviewReport, getProjectProgressReport, getUserWorkloadReport
 } from "@/services/reports/reports.service";
+import ReportsSkeleton from "./ReportsSkeleton";
 
 interface ReportsViewProps {
   projects: IProject[];
@@ -140,10 +141,7 @@ export default function ReportsView({ projects, users }: ReportsViewProps) {
       {activeTab === "overview" && (
         <div className="space-y-6">
           {isLoadingOverview && !overviewData ? (
-            <div className="flex flex-col items-center justify-center py-20">
-              <Loader2 className="h-8 w-8 text-indigo-500 animate-spin mb-3" />
-              <span className="text-zinc-500 text-sm font-semibold">Generating metrics overview...</span>
-            </div>
+            <ReportsSkeleton />
           ) : !overviewData ? (
             <div className="text-center py-10 text-zinc-600 text-xs">
               No overview data available.
@@ -242,10 +240,7 @@ export default function ReportsView({ projects, users }: ReportsViewProps) {
           </div>
 
           {isLoadingProject && !projectReport ? (
-            <div className="flex flex-col items-center justify-center py-20">
-              <Loader2 className="h-8 w-8 text-indigo-500 animate-spin mb-3" />
-              <span className="text-zinc-500 text-sm font-semibold">Generating project progress report...</span>
-            </div>
+            <ReportsSkeleton />
           ) : !projectReport ? (
             <div className="text-center py-10 text-zinc-600 text-xs">
               No report available for this project.
@@ -360,10 +355,7 @@ export default function ReportsView({ projects, users }: ReportsViewProps) {
           </div>
 
           {isLoadingUser && !userReport ? (
-            <div className="flex flex-col items-center justify-center py-20">
-              <Loader2 className="h-8 w-8 text-indigo-500 animate-spin mb-3" />
-              <span className="text-zinc-500 text-sm font-semibold">Generating resource workload report...</span>
-            </div>
+            <ReportsSkeleton />
           ) : !userReport ? (
             <div className="text-center py-10 text-zinc-600 text-xs">
               No workload report available.

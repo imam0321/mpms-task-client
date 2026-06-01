@@ -3,9 +3,14 @@
 import { serverFetch } from "@/lib/server-fetch";
 import { ApiResponse, IUser } from "@/types/api.types";
 
-export async function getAllUsers(): Promise<ApiResponse<IUser[]>> {
-  const res = await serverFetch.get("/users");
-  return res.json();
+export async function getAllUsers(queryString?: string): Promise<ApiResponse<IUser[]>> {
+  try {
+    const res = await serverFetch.get(`/users${queryString ? `?${queryString}` : ""}`);
+    return res.json();
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Failed to fetch users";
+    return { success: false, message };
+  }
 }
 
 import { zodValidator } from "@/lib/zodValidator";

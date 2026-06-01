@@ -1,36 +1,70 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MPMS Task Client
 
-## Getting Started
+This repository contains the frontend for the MPMS Task application.
+It is built with Next.js 16, React 19, Tailwind CSS, and shadcn/ui.
+The client uses server actions, Zod validation, and cookie-based auth with a separate Express backend.
 
-First, run the development server:
+## Features
+
+- Authentication and registration flows
+- Team member management (add, edit, delete)
+- Project, sprint, task, time log, and report management
+- Zod validation for client-server payloads
+- Reusable UI components with shadcn patterns
+- API calls through a shared `serverFetch` helper
+
+## Prerequisites
+
+- Node.js 20 or newer
+- npm, pnpm, or yarn
+- Backend API running and reachable via `NEXT_PUBLIC_BASE_API`
+
+## Setup
+
+1. Install dependencies:
+
+```bash
+cd mpms-task-client
+npm install
+```
+
+2. Create a `.env.local` file with the backend URL:
+
+```bash
+NEXT_PUBLIC_BASE_API=http://localhost:5000
+```
+
+3. Start the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. Open the app in your browser:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```text
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Available Scripts
 
-## Learn More
+- `npm run dev` - start the Next.js development server
+- `npm run build` - build the production application
+- `npm run start` - run the built production app
+- `npm run lint` - run ESLint checks
 
-To learn more about Next.js, take a look at the following resources:
+## Environment Variables
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `NEXT_PUBLIC_BASE_API` - the backend API base URL for all client requests.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Notes
 
-## Deploy on Vercel
+- The frontend sends auth cookies to the backend via `serverFetch`.
+- Team member forms are handled with `useActionState` and validated via Zod on the server.
+- Remote images require the configured `next.config.ts` remote pattern.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Recommended Workflow
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Run the backend first
+- Then start the frontend
+- Use the browser to verify login, team management, and project workflows
