@@ -9,6 +9,12 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  experimental: {
+    serverActions: {
+      // Default 1mb blocks project thumbnails in production (multipart FormData)
+      bodySizeLimit: "10mb",
+    },
+  },
 };
 
 export default nextConfig;

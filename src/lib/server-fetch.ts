@@ -7,11 +7,12 @@ const serverFetchHelper = async (endpoint: string, options: RequestInit): Promis
   const accessToken = await getCookie("accessToken");
 
   const response = await fetch(`${base_url}${endpoint}`, {
+    cache: "no-store",
     headers: {
       ...headers,
       Cookie: accessToken ? `accessToken=${accessToken}` : "",
     },
-    ...restOptions
+    ...restOptions,
   });
 
   return response

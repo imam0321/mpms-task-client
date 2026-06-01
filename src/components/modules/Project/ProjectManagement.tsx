@@ -41,6 +41,11 @@ export default function ProjectManagement({
     });
   };
 
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    setEditingProject(undefined);
+  };
+
   const handleOpenCreate = () => {
     setEditingProject(undefined);
     setOpenModal(true);
@@ -146,8 +151,9 @@ export default function ProjectManagement({
       )}
       {canManage && (
         <ProjectFormDialog
+          key={editingProject?._id ?? "create-project"}
           open={openModal}
-          onClose={() => setOpenModal(false)}
+          onClose={handleCloseModal}
           onSuccess={handleSuccess}
           project={editingProject}
           allUsers={users}

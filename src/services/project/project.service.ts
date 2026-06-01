@@ -1,6 +1,13 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { serverFetch } from "@/lib/server-fetch";
+
+function revalidateProjectPages() {
+  revalidatePath("/dashboard/admin", "layout");
+  revalidatePath("/dashboard/manager/projects");
+  revalidatePath("/dashboard/member/projects");
+}
 
 export async function getAllProjects(queryString?: string) {
   try {
@@ -74,6 +81,15 @@ export async function createProject(prevState: any, formData: FormData) {
       body: backendFormData,
     });
     const result = await res.json();
+    if (!res.ok && !result?.message) {
+      return {
+        success: false,
+        message: `Failed to create project (${res.status})`,
+      };
+    }
+    if (result?.success) {
+      revalidateProjectPages();
+    }
     return result;
   } catch (error: any) {
     return { success: false, message: error?.message || "Failed to create project" };
@@ -124,6 +140,9 @@ export async function updateProject(id: string, prevState: any, formData: FormDa
       body: backendFormData,
     });
     const result = await res.json();
+    if (result?.success) {
+      revalidateProjectPages();
+    }
     return result;
   } catch (error: any) {
     return { success: false, message: error?.message || "Failed to update project" };
@@ -134,6 +153,9 @@ export async function deleteProject(id: string) {
   try {
     const res = await serverFetch.delete(`/projects/${id}`);
     const result = await res.json();
+    if (result?.success) {
+      revalidateProjectPages();
+    }
     return result;
   } catch (error: any) {
     return { success: false, message: error?.message || "Failed to delete project" };

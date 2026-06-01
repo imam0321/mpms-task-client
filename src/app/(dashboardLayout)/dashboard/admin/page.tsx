@@ -3,7 +3,7 @@ import DashboardHeader from "@/components/modules/Dashboard/DashboardHeader";
 import { getAllProjects, getProjectStats } from "@/services/project/project.service";
 import { getAllUsers } from "@/services/user/user.service";
 import ProjectManagement from "@/components/modules/Project/ProjectManagement";
-import { IProject } from "@/types/api.types";
+import { IProject, IProjectStats } from "@/types/api.types";
 import PaginationHelper from "@/components/shared/PaginationHelper";
 import { Suspense } from "react";
 import StatsCardSkeleton from "@/components/modules/Project/ProjectSkeleton/StatsCardSkeleton";
@@ -24,12 +24,19 @@ export default async function AdminDashboard({
     }
   });
 
+  if (!queryParams.has("limit")) {
+    queryParams.set("limit", "100");
+  }
+
   const projects = await getAllProjects(queryParams.toString());
-  const projectStats = await Promise.all(
-    projects?.data?.map((project: IProject) =>
+  const statsResults = await Promise.allSettled(
+    (projects?.data ?? []).map((project: IProject) =>
       getProjectStats(project._id).then((res) => res?.data)
     )
-  ).then((arr) => arr.filter(Boolean));
+  );
+  const projectStats = statsResults
+    .filter((r): r is PromiseFulfilledResult<IProjectStats> => r.status === "fulfilled" && !!r.value)
+    .map((r) => r.value);
 
   const users = await getAllUsers();
 

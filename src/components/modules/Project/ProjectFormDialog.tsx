@@ -105,6 +105,7 @@ export default function ProjectFormDialog({
         </DialogHeader>
 
         <form
+          key={isEdit ? `edit-${project._id}` : "create-project-form"}
           ref={formRef}
           action={formAction}
           className="flex-1 overflow-y-auto p-6 space-y-5 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent scroll-smooth max-h-[60vh]"

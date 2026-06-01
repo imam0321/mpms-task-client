@@ -19,6 +19,10 @@ export default async function MemberProjectsPage({
     }
   });
 
+  if (!queryParams.has("limit")) {
+    queryParams.set("limit", "100");
+  }
+
   const projects = await getAllProjects(queryParams.toString());
 
   const users = await getAllUsers();

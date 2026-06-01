@@ -18,12 +18,12 @@ const demoUsers = {
     password: "123456789",
   },
   member: {
-    email: "puloweseku@mailinator.com",
-    password: "puloweseku@mailinator.com",
+    email: "imran.hossain@mpms.dev",
+    password: "imran.hossain@mpms.dev",
   },
   manager: {
-    email: "moderator@gmail.com",
-    password: "123456789",
+    email: "arif.mahmud@mpms.dev",
+    password: "arif.mahmud@mpms.dev",
   },
 };
 
