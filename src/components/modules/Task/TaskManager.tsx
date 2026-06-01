@@ -1,7 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { IProject, ISprint, ITask, IUser } from "@/types/api.types";
 import { deleteTask } from "@/services/task/task.service";
@@ -38,8 +38,6 @@ export default function TaskManager({
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [isTaskDetailOpen, setIsTaskDetailOpen] = useState(false);
 
-  const router = useRouter();
-
   const [taskToDelete, setTaskToDelete] = useState<ITask | null>(null);
   const [isDeletePending, setIsDeletePending] = useState(false);
 
@@ -51,13 +49,6 @@ export default function TaskManager({
   };
 
   const handleTaskClick = (task: ITask) => {
-    // Members should navigate to the project detail page instead of opening the task panel
-    const projectId = typeof task.project === "object" ? task.project._id : task.project;
-    if (currentUser.role === "Member") {
-      router.push(`/dashboard/member/projects/${projectId}`);
-      return;
-    }
-
     setSelectedTaskId(task._id);
     setIsTaskDetailOpen(true);
   };
@@ -104,11 +95,6 @@ export default function TaskManager({
 
   return (
     <>
-      {/*
-        key= forces full remount when switching create ↔ edit:
-        - re-initialises useActionState with the correct server action
-        - resets all defaultValue inputs to the new task's data
-      */}
       <TaskFormDialog
         key={editingTask ? editingTask._id : "create"}
         isOpen={isTaskDialogOpen}

@@ -126,8 +126,8 @@ export default function ProjectDetailView({
         onRefresh={fetchSprintsAndTasks}
         onAddTask={(sprintId) => addTaskFnRef.current(sprintId)}
         onTaskClick={(task) => taskClickFnRef.current(task)}
-        onEditTask={(task) => editTaskFnRef.current(task)}
-        onDeleteTask={(task) => deleteTaskFnRef.current(task)}
+        onEditTask={canManage ? (task) => editTaskFnRef.current(task) : undefined}
+        onDeleteTask={canManage ? (task) => deleteTaskFnRef.current(task) : undefined}
       />
 
       {/* Task dialogs */}

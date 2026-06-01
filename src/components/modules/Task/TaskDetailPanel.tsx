@@ -261,6 +261,9 @@ export default function TaskDetailPanel({
     });
   };
 
+  const canManage =
+    currentUser.role === "Admin" || currentUser.role === "Manager";
+
   const isOverdue =
     task?.dueDate &&
     new Date(task.dueDate) < new Date() &&
@@ -278,9 +281,11 @@ export default function TaskDetailPanel({
       <SheetContent
         onInteractOutside={(e) => e.preventDefault()}
         side="right"
-        className="w-full sm:max-w-xl bg-zinc-950 border-l border-zinc-900 p-0 flex flex-col h-full shadow-2xl overflow-hidden focus:outline-hidden"
+        className="w-full sm:max-w-2xl lg:!max-w-2xl bg-zinc-950 border-l border-zinc-900 p-0 flex flex-col h-full shadow-2xl overflow-hidden focus:outline-hidden"
       >
-        <SheetTitle className="sr-only">Task Details: {task?.title || 'Loading'}</SheetTitle>
+        <SheetTitle className="sr-only">
+          Task Details: {task?.title || "Loading"}
+        </SheetTitle>
         {isLoading && !task ? (
           <div className="flex flex-col h-full animate-pulse">
             {/* Skeleton Header */}
@@ -305,7 +310,10 @@ export default function TaskDetailPanel({
             {/* Skeleton Tabs */}
             <div className="flex border-b border-zinc-900 shrink-0 bg-zinc-950 gap-1 px-1">
               {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="flex-1 py-3 flex items-center justify-center">
+                <div
+                  key={i}
+                  className="flex-1 py-3 flex items-center justify-center"
+                >
                   <div className="h-4 w-12 bg-zinc-800/50 rounded" />
                 </div>
               ))}
@@ -340,7 +348,10 @@ export default function TaskDetailPanel({
                 <div className="h-2 w-24 bg-zinc-800/60 rounded" />
                 <div className="flex flex-wrap gap-2">
                   {[1, 2, 3].map((i) => (
-                    <div key={i} className="flex items-center gap-2 p-1.5 pr-3 bg-zinc-900/50 border border-zinc-800 rounded-xl">
+                    <div
+                      key={i}
+                      className="flex items-center gap-2 p-1.5 pr-3 bg-zinc-900/50 border border-zinc-800 rounded-xl"
+                    >
                       <div className="h-6 w-6 rounded-full bg-zinc-800" />
                       <div className="space-y-1">
                         <div className="h-3 w-16 bg-zinc-800 rounded" />
@@ -356,7 +367,10 @@ export default function TaskDetailPanel({
                 <div className="h-2 w-28 bg-zinc-800/60 rounded" />
                 <div className="space-y-2">
                   {[1, 2].map((i) => (
-                    <div key={i} className="flex items-center gap-3 p-3 rounded-xl border border-zinc-900 bg-zinc-950/40">
+                    <div
+                      key={i}
+                      className="flex items-center gap-3 p-3 rounded-xl border border-zinc-900 bg-zinc-950/40"
+                    >
                       <div className="h-4 w-4 bg-zinc-800 rounded" />
                       <div className="h-3 w-2/3 bg-zinc-800/40 rounded" />
                     </div>
@@ -369,7 +383,9 @@ export default function TaskDetailPanel({
           <div className="flex flex-col items-center justify-center h-full text-zinc-500">
             <FileText className="h-10 w-10 mb-3 text-zinc-700" />
             <span className="text-sm font-semibold">Task not found</span>
-            <span className="text-xs text-zinc-600 mt-1">This task may have been deleted or is unavailable.</span>
+            <span className="text-xs text-zinc-600 mt-1">
+              This task may have been deleted or is unavailable.
+            </span>
           </div>
         ) : (
           <>
@@ -432,9 +448,7 @@ export default function TaskDetailPanel({
                     )}
                     {task.status === "Review" && (
                       <>
-                        {task.reviewRequired &&
-                        (currentUser.role === "Admin" ||
-                          currentUser.role === "Manager") ? (
+                        {task.reviewRequired && canManage ? (
                           <Button
                             onClick={handleApprove}
                             disabled={isPending}
@@ -455,14 +469,16 @@ export default function TaskDetailPanel({
                             Mark as Done
                           </Button>
                         )}
-                        <Button
-                          onClick={() => handleStatusChange("In Progress")}
-                          disabled={isPending}
-                          variant="outline"
-                          className="border-zinc-800 text-zinc-400 hover:text-zinc-200 text-[11px] h-8 rounded-lg font-bold px-3 cursor-pointer"
-                        >
-                          Request Re-work
-                        </Button>
+                        {canManage && (
+                          <Button
+                            onClick={() => handleStatusChange("In Progress")}
+                            disabled={isPending}
+                            variant="outline"
+                            className="border-zinc-800 text-zinc-400 hover:text-zinc-200 text-[11px] h-8 rounded-lg font-bold px-3 cursor-pointer"
+                          >
+                            Request Re-work
+                          </Button>
+                        )}
                       </>
                     )}
                   </>
@@ -777,8 +793,6 @@ export default function TaskDetailPanel({
                                   : Number(e.target.value),
                               )
                             }
-                            step={0.5}
-                            min={0.1}
                             className="bg-zinc-900/40 border-zinc-800 text-zinc-200 focus:border-zinc-700 rounded-xl h-9"
                             required
                           />

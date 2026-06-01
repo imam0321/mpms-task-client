@@ -154,8 +154,8 @@ export default function SprintManager({
               onReorderSprint={canManage ? handleReorderSprint : undefined}
               onAddTask={canManage ? onAddTask : undefined}
               onTaskClick={onTaskClick}
-              onEditTask={onEditTask}
-              onDeleteTask={onDeleteTask}
+              onEditTask={canManage ? onEditTask : undefined}
+              onDeleteTask={canManage ? onDeleteTask : undefined}
             />
           ))}
         </div>
