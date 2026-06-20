@@ -30,11 +30,10 @@ const iconMap: Record<string, LucideIcon> = {
   FileText,
   MessageSquare,
   Activity,
-  category: Layers, // Map the non-standard "category" string to Lucide's Layers icon
+  category: Layers, 
 };
 
 export const getIconComponent = (name: string): LucideIcon => {
-  // Return the mapped icon or fall back to Box if not found
   return iconMap[name] || Box;
 };
 export default iconMap;

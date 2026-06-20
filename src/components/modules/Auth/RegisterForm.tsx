@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import {
   User,
   Mail,
-  Lock,
   Briefcase,
   Network,
   Tags,

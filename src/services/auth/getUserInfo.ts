@@ -21,7 +21,6 @@ export async function getUserInfo(): Promise<IUserInfo | null> {
       email: result.payload.email,
       role: result.payload.role as UserRole,
       name: result.payload.name,
-      profileImg: result.payload.profileImg,
     };
   }
 

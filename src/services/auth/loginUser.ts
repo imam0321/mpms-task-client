@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import { parse } from "cookie";
 import { redirect } from "next/navigation";
-import { deleteCookie, setCookie } from "./tokenHandlers";
+import { setCookie } from "./tokenHandlers";
 import { loginValidationZodSchema } from "@/zod/auth.validation";
 import { serverFetch } from "@/lib/server-fetch";
 import { zodValidator } from "@/lib/zodValidator";

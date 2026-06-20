@@ -1,7 +1,8 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Calendar, DollarSign, Briefcase, Users, Clock, ArrowLeft, Edit } from "lucide-react";
+import { Calendar, DollarSign, Briefcase, Users, ArrowLeft, Edit } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { IProject } from "@/types/api.types";
@@ -197,7 +198,7 @@ export default function ProjectDetailHeader({
                     className="h-7 w-7 rounded-full ring-2 ring-zinc-950 bg-zinc-800 overflow-hidden flex items-center justify-center text-[10px] font-bold text-zinc-300 cursor-pointer hover:z-10 hover:scale-110 transition-transform duration-150"
                   >
                     {member.profileImg ? (
-                      <img src={member.profileImg} alt={member.name} className="h-full w-full object-cover" />
+                      <Image width={200} height={200} src={member.profileImg} alt={member.name} className="h-full w-full object-cover" />
                     ) : (
                       <span>{member.name.charAt(0).toUpperCase()}</span>
                     )}

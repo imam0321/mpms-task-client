@@ -1,7 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import { serverFetch } from "@/lib/server-fetch";
 import { ApiResponse, IUser } from "@/types/api.types";
+import { zodValidator } from "@/lib/zodValidator";
+import { addMemberValidationSchema, updateMemberValidationSchema } from "@/zod/member.validation";
 
 export async function getAllUsers(queryString?: string): Promise<ApiResponse<IUser[]>> {
   try {
@@ -12,9 +15,6 @@ export async function getAllUsers(queryString?: string): Promise<ApiResponse<IUs
     return { success: false, message };
   }
 }
-
-import { zodValidator } from "@/lib/zodValidator";
-import { addMemberValidationSchema, updateMemberValidationSchema } from "@/zod/member.validation";
 
 export async function addMember(prevState: any, formData: FormData): Promise<any> {
   const name = formData.get("name") as string;

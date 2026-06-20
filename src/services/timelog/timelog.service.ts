@@ -2,6 +2,8 @@
 "use server";
 
 import { serverFetch } from "@/lib/server-fetch";
+import { zodValidator } from "@/lib/zodValidator";
+import { timeLogValidationSchema } from "@/zod/timelog.validation";
 
 export async function getMyTimeLogStats() {
   try {
@@ -21,9 +23,6 @@ export async function getTimeLogsByTask(taskId: string) {
     return { success: false, message: error?.message || "Failed to fetch time logs" };
   }
 }
-
-import { zodValidator } from "@/lib/zodValidator";
-import { timeLogValidationSchema } from "@/zod/timelog.validation";
 
 export async function createTimeLog(
   prevState: any,

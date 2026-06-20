@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import React, { useState, useEffect, useRef, useActionState } from "react";
@@ -11,6 +13,7 @@ import SingleImageUploader from "@/components/ui/SingleImageUploader";
 import { IProject, IUser, ProjectStatus } from "@/types/api.types";
 import { createProject, updateProject } from "@/services/project/project.service";
 import InputFieldError from "@/components/shared/InputFieldError";
+import Image from "next/image";
 
 interface ProjectFormDialogProps {
   open: boolean;
@@ -302,7 +305,7 @@ export default function ProjectFormDialog({
                         </div>
 
                         {user.profileImg ? (
-                          <img src={user.profileImg} alt={user.name} className="h-8 w-8 rounded-full object-cover border border-zinc-850" />
+                          <Image src={user.profileImg} alt={user.name} className="h-8 w-8 rounded-full object-cover border border-zinc-850" />
                         ) : (
                           <div className="h-8 w-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-300 border border-zinc-700/50">
                             {user.name.charAt(0).toUpperCase()}

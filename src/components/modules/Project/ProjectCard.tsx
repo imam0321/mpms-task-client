@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useState, useEffect } from "react";
 import { formatDate } from "@/lib/formatDate";
 import { IProject } from "@/types/api.types";

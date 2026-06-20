@@ -6,10 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { loginUser } from "@/services/auth/loginUser";
-import { Eye, EyeOff, Lock, LogIn, Mail } from "lucide-react";
+import { LogIn, Mail } from "lucide-react";
 import { useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 import PasswordInput from "@/components/ui/PasswordInput";
 
 const demoUsers = {
@@ -36,7 +35,6 @@ export default function LoginForm({
   const [password, setPassword] = useState("");
 
   const [state, formAction, isPending] = useActionState(loginUser, null);
-  const router = useRouter();
 
   useEffect(() => {
     if (state) {

@@ -1,6 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import { serverFetch } from "@/lib/server-fetch";
+import { zodValidator } from "@/lib/zodValidator";
+import { sprintValidationSchema } from "@/zod/sprint.validation";
 
 export async function getSprintsByProject(projectId: string) {
   try {
@@ -11,9 +14,6 @@ export async function getSprintsByProject(projectId: string) {
     return { success: false, message: error?.message || "Failed to fetch sprints" };
   }
 }
-
-import { zodValidator } from "@/lib/zodValidator";
-import { sprintValidationSchema } from "@/zod/sprint.validation";
 
 export async function createSprint(
   _prevState: any,
@@ -87,7 +87,7 @@ export async function updateSprint(
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         id: sprintId,
-        title: title,
+        title: validatedPayload?.data?.title,
         startDate: startDate,
         endDate: endDate,
       }),

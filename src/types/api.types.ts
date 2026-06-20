@@ -1,4 +1,4 @@
-// ──── User ────────────────────────────────────────────────────────────────────
+
 export type UserRole = "Admin" | "Manager" | "Member";
 
 export interface IUser {
@@ -14,7 +14,6 @@ export interface IUser {
   createdAt?: string;
 }
 
-// ──── Project ─────────────────────────────────────────────────────────────────
 export type ProjectStatus = "planned" | "active" | "completed" | "archived";
 
 export interface IProject {
@@ -42,7 +41,6 @@ export interface IProjectStats {
   daysRemaining: number;
 }
 
-// ──── Sprint ──────────────────────────────────────────────────────────────────
 export interface ISprint {
   _id: string;
   project: string;
@@ -54,7 +52,6 @@ export interface ISprint {
   createdAt?: string;
 }
 
-// ──── Task ────────────────────────────────────────────────────────────────────
 export type TaskPriority = "Low" | "Medium" | "High" | "Critical";
 export type TaskStatus = "To Do" | "In Progress" | "Review" | "Done";
 
@@ -80,7 +77,6 @@ export interface ITask {
   createdAt?: string;
 }
 
-// ──── TimeLog ─────────────────────────────────────────────────────────────────
 export interface ITimeLog {
   _id: string;
   task: string | ITask;
@@ -91,7 +87,6 @@ export interface ITimeLog {
   createdAt?: string;
 }
 
-// ──── API Response ────────────────────────────────────────────────────────────
 export interface PaginationMeta {
   page: number;
   limit: number;
