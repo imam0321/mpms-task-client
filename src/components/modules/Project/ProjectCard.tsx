@@ -119,7 +119,7 @@ export default function ProjectCard({ project, onEdit, onDelete, basePath }: Pro
           </p>
         )}
 
-        <hr className="border-zinc-800/70" />
+        <hr className="border-zinc-800/70 mt-auto" />
 
         <div className="grid grid-cols-2 gap-3">
           <div className="flex flex-col gap-1">
@@ -142,23 +142,6 @@ export default function ProjectCard({ project, onEdit, onDelete, basePath }: Pro
           </div>
         </div>
 
-        {/* <div className="flex flex-col gap-1.5">
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">
-              Time elapsed
-            </span>
-            <span className="text-[11px] font-medium text-zinc-300">
-              {percentage}%
-            </span>
-          </div>
-          <div className="h-1 w-full overflow-hidden rounded-full border border-zinc-800 bg-zinc-800/60">
-            <div
-              className={`h-full rounded-full transition-all duration-500 ${config.progress}`}
-              style={{ width: `${percentage}%` }}
-            />
-          </div>
-        </div> */}
-
         <div className="flex items-center justify-between">
           <span className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">
             Team
@@ -173,7 +156,9 @@ export default function ProjectCard({ project, onEdit, onDelete, basePath }: Pro
                     className="-ml-1.5 flex h-6 w-6 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-zinc-950 bg-[#3C3489] text-[10px] font-medium text-[#AFA9EC] transition-transform duration-150 hover:z-10 hover:scale-110 first:ml-0"
                   >
                     {member.profileImg ? (
-                      <img
+                      <Image
+                        width={200}
+                        height={200}
                         src={member.profileImg}
                         alt={member.name}
                         className="h-full w-full object-cover"
