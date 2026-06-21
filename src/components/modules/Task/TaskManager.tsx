@@ -16,7 +16,6 @@ interface TaskManagerProps {
   onRefresh: () => Promise<void>;
   onAddTaskRef?: (fn: (sprintId: string) => void) => void;
   onTaskClickRef?: (fn: (task: ITask) => void) => void;
-  // NEW: expose edit/delete handlers to parent (ProjectDetailView → SprintManager)
   onEditTaskRef?: (fn: (task: ITask) => void) => void;
   onDeleteTaskRef?: (fn: (task: ITask) => void) => void;
 }
@@ -41,7 +40,6 @@ export default function TaskManager({
   const [taskToDelete, setTaskToDelete] = useState<ITask | null>(null);
   const [isDeletePending, setIsDeletePending] = useState(false);
 
-  // ── handlers ──────────────────────────────────────────────────────────────
   const handleOpenAddTask = (sprintId: string) => {
     setEditingTask(null);
     setSelectedSprintId(sprintId);

@@ -174,11 +174,20 @@ export async function updateTask(
   }
 }
 
-export async function changeTaskStatus(id: string, status: string) {
+export async function changeTaskStatus(
+  id: string,
+  status: string,
+  taskCompletedTime?: number
+) {
   try {
+    const body: { status: string; taskCompletedTime?: number } = { status };
+    if (taskCompletedTime !== undefined && taskCompletedTime > 0) {
+      body.taskCompletedTime = taskCompletedTime;
+    }
+
     const res = await serverFetch.patch(`/tasks/${id}/status`, {
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status }),
+      body: JSON.stringify(body),
     });
     const result = await res.json();
     return result;

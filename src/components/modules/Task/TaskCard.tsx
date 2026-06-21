@@ -3,15 +3,17 @@
 import { Calendar, CheckSquare, Clock, AlertTriangle, Edit2, Trash2 } from "lucide-react";
 import { ITask, TaskPriority } from "@/types/api.types";
 import { formatDate } from "@/lib/formatDate";
+import TimeCount from "./TimeCount";
 
 interface TaskCardProps {
   task: ITask;
   onClick: () => void;
   onEdit?: (task: ITask) => void;
   onDelete?: (task: ITask) => void;
+  currentUserId?: string;
 }
 
-export default function TaskCard({ task, onClick, onEdit, onDelete }: TaskCardProps) {
+export default function TaskCard({ task, onClick, onEdit, onDelete, currentUserId }: TaskCardProps) {
   const completedSubtasks = task.subtasks?.filter((s) => s.isCompleted).length ?? 0;
   const totalSubtasks = task.subtasks?.length ?? 0;
 
@@ -66,12 +68,17 @@ export default function TaskCard({ task, onClick, onEdit, onDelete }: TaskCardPr
         >
           {task.priority}
         </span>
-        {task.estimate && (
-          <div className="flex items-center gap-1 text-[10px] text-zinc-500">
-            <Clock className="h-3 w-3" />
-            <span>{task.estimate}h</span>
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          {currentUserId && task.status === "In Progress" && (
+            <TimeCount task={task} userId={currentUserId} />
+          )}
+          {task.estimate && (
+            <div className="flex items-center gap-1 text-[10px] text-zinc-500">
+              <Clock className="h-3 w-3" />
+              <span>{task.estimate}h</span>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Title */}

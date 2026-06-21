@@ -15,6 +15,7 @@ interface SprintSectionProps {
   tasks: ITask[];
   index: number;
   totalSprints: number;
+  currentUserId?: string;
   onEditSprint?: (sprint: ISprint) => void;
   onDeleteSprint?: (sprint: ISprint) => void;
   onReorderSprint?: (sprint: ISprint, direction: "up" | "down") => void;
@@ -29,6 +30,7 @@ export default function SprintSection({
   tasks,
   index,
   totalSprints,
+  currentUserId,
   onEditSprint,
   onDeleteSprint,
   onReorderSprint,
@@ -231,6 +233,7 @@ export default function SprintSection({
                             onClick={() => onTaskClick(task)}
                             onEdit={onEditTask}
                             onDelete={onDeleteTask}
+                            currentUserId={currentUserId}
                           />
                         ))
                       )}

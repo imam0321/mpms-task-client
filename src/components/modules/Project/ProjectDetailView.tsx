@@ -125,6 +125,7 @@ export default function ProjectDetailView({
         sprints={sprints}
         tasksBySprint={tasksBySprint}
         isLoading={isLoading}
+        currentUserId={currentUser._id}
         onRefresh={fetchSprintsAndTasks}
         onAddTask={(sprintId) => addTaskFnRef.current(sprintId)}
         onTaskClick={(task) => taskClickFnRef.current(task)}

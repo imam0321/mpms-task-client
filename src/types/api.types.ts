@@ -74,6 +74,8 @@ export interface ITask {
   attachments: string[];
   subtasks: ISubtask[];
   reviewRequired: boolean;
+  workStartedAt?: string;
+  taskCompletedTime?: number;
   createdAt?: string;
 }
 

@@ -17,6 +17,7 @@ interface SprintManagerProps {
   sprints: ISprint[];
   tasksBySprint: Record<string, ITask[]>;
   isLoading: boolean;
+  currentUserId?: string;
   onRefresh: () => Promise<void>;
   onAddTask: (sprintId: string) => void;
   onTaskClick: (task: ITask) => void;
@@ -29,6 +30,8 @@ export default function SprintManager({
   canManage,
   sprints,
   tasksBySprint,
+  isLoading,
+  currentUserId,
   onRefresh,
   onAddTask,
   onTaskClick,
@@ -150,6 +153,7 @@ export default function SprintManager({
               tasks={tasksBySprint[sprint._id] || []}
               index={index}
               totalSprints={sprints.length}
+              currentUserId={currentUserId}
               onEditSprint={canManage ? handleOpenEdit : undefined}
               onDeleteSprint={canManage ? setSprintToDelete : undefined}
               onReorderSprint={canManage ? handleReorderSprint : undefined}
